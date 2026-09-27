@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-    <script src='//libtl.com/sdk.js' data-zone='11903209' data-sdk='show_11903209'></script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>My Video App</title>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <script src='//libtl.com/sdk.js' data-zone='11903209' data-sdk='show_11903209'></script>
 
     <style>
         * {
@@ -31,56 +30,53 @@
         }
 
         .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
+            text-align: center;
+            padding: 20px 0;
         }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .logo {
+            font-size: 45px;
         }
 
-        .brand-icon {
-            font-size: 32px;
+        h1 {
+            margin: 8px 0;
+            font-size: 24px;
         }
 
-        .brand-name {
-            font-size: 20px;
-            font-weight: bold;
+        .subtitle {
+            color: var(--tg-theme-hint-color, #777);
+            font-size: 14px;
         }
 
         .search {
             width: 100%;
-            padding: 14px 16px;
+            padding: 14px;
             border: none;
             border-radius: 12px;
-            outline: none;
-            background: var(
-                --tg-theme-secondary-bg-color,
-                #f2f2f2
-            );
-            color: var(--tg-theme-text-color, #000000);
+            background: var(--tg-theme-secondary-bg-color, #f1f1f1);
+            color: var(--tg-theme-text-color, #000);
             font-size: 16px;
+            outline: none;
             margin-bottom: 20px;
         }
 
         .section-title {
-            font-size: 19px;
+            font-size: 20px;
             font-weight: bold;
             margin-bottom: 12px;
         }
 
+        #status {
+            text-align: center;
+            padding: 20px;
+            color: var(--tg-theme-hint-color, #777);
+        }
+
         .video-card {
+            background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            border-radius: 14px;
             padding: 15px;
             margin-bottom: 12px;
-            border-radius: 14px;
-            background: var(
-                --tg-theme-secondary-bg-color,
-                #f2f2f2
-            );
         }
 
         .video-title {
@@ -91,29 +87,25 @@
 
         .video-info {
             font-size: 13px;
-            color: var(--tg-theme-hint-color, #777777);
-            margin-bottom: 12px;
+            color: var(--tg-theme-hint-color, #777);
+            line-height: 1.6;
         }
 
-        .watch-button {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
+        .video-code {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            background: var(--tg-theme-bg-color, #fff);
+            font-size: 12px;
         }
 
         .empty {
             text-align: center;
-            padding: 40px 20px;
-            color: var(--tg-theme-hint-color, #777777);
+            padding: 30px 10px;
+            color: var(--tg-theme-hint-color, #777);
         }
     </style>
-
 </head>
 
 <body>
@@ -121,108 +113,229 @@
 <div class="app">
 
     <div class="header">
-        <div class="brand">
-            <div class="brand-icon">🎬</div>
-            <div class="brand-name">My Video App</div>
-        </div>
+        <div class="logo">🎬</div>
+        <h1>My Video App</h1>
+        <div class="subtitle">Latest videos</div>
     </div>
 
     <input
-        type="search"
+        type="text"
+        id="search"
         class="search"
-        placeholder="Search videos..."
-        id="searchInput"
+        placeholder="🔎 Search videos..."
     >
 
     <div class="section-title">
         Latest Videos
     </div>
 
-    <div id="videoList">
-
-        <div class="video-card">
-
-            <div class="video-title">
-                Your Video
-            </div>
-
-            <div class="video-info">
-                New upload • Tamil
-            </div>
-
-            <button class="watch-button">
-                ▶ Watch
-            </button>
-
-        </div>
-
-        <div class="video-card">
-
-            <div class="video-title">
-                Another Video
-            </div>
-
-            <div class="video-info">
-                Featured • Tamil
-            </div>
-
-            <button class="watch-button">
-                ▶ Watch
-            </button>
-
-        </div>
-
+    <div id="status">
+        Loading videos...
     </div>
+
+    <div id="videos"></div>
 
 </div>
 
-
 <script>
 
-    // Telegram Mini App
     const tg = window.Telegram.WebApp;
 
     tg.ready();
     tg.expand();
 
+    // Your NEW Make.com webhook
+    const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/ud3xahsh42yybn9byb7pu8i7bzv7i4ra";
 
-    // Search
-    const searchInput = document.getElementById("searchInput");
-    const videoCards = document.querySelectorAll(".video-card");
+    let allVideos = [];
 
-    searchInput.addEventListener("input", function () {
+    async function loadVideos() {
 
-        const searchText =
-            this.value.toLowerCase().trim();
+        const status = document.getElementById("status");
+        const videosContainer = document.getElementById("videos");
 
-        videoCards.forEach(function (card) {
+        try {
 
-            const title =
-                card.querySelector(".video-title")
-                    .textContent
-                    .toLowerCase();
+            const response = await fetch(MAKE_WEBHOOK_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    source: "telegram_mini_app",
+                    telegram_user: tg.initDataUnsafe?.user || null
+                })
+            });
 
-            card.style.display =
-                title.includes(searchText)
-                    ? "block"
-                    : "none";
+            if (!response.ok) {
+                throw new Error("Make.com request failed");
+            }
+
+            const data = await response.json();
+
+            console.log("Make.com response:", data);
+
+            if (!data.success) {
+                throw new Error("Make.com returned an error");
+            }
+
+            allVideos = data.videos || [];
+
+            status.style.display = "none";
+
+            renderVideos(allVideos);
+
+        } catch (error) {
+
+            console.error(error);
+
+            status.innerHTML =
+                "❌ Unable to load videos.<br><br>" +
+                "Please try again later.";
+
+        }
+    }
+
+
+    function renderVideos(videos) {
+
+        const container = document.getElementById("videos");
+
+        container.innerHTML = "";
+
+        if (!videos || videos.length === 0) {
+
+            container.innerHTML = `
+                <div class="empty">
+                    No videos found.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        videos.forEach(video => {
+
+            const card = document.createElement("div");
+
+            card.className = "video-card";
+
+            card.innerHTML = `
+
+                <div class="video-title">
+                    ${escapeHTML(video.movie_name || video.file_name || "Untitled Video")}
+                </div>
+
+                <div class="video-info">
+
+                    ${video.year ? `📅 Year: ${escapeHTML(video.year)}<br>` : ""}
+
+                    ${video.language ? `🌐 Language: ${escapeHTML(video.language)}<br>` : ""}
+
+                    ${video.genre ? `🎭 Genre: ${escapeHTML(video.genre)}<br>` : ""}
+
+                    ${video.file_size ? `💾 Size: ${escapeHTML(video.file_size)}<br>` : ""}
+
+                    ${video.caption ? `📝 ${escapeHTML(video.caption)}` : ""}
+
+                </div>
+
+                ${
+                    video.short_code
+                    ? `<div class="video-code">Code: ${escapeHTML(video.short_code)}</div>`
+                    : ""
+                }
+
+            `;
+
+            container.appendChild(card);
+
+        });
+    }
+
+
+    document.getElementById("search").addEventListener("input", function () {
+
+        const query = this.value.toLowerCase().trim();
+
+        if (!query) {
+
+            renderVideos(allVideos);
+
+            return;
+        }
+
+        const filtered = allVideos.filter(video => {
+
+            const text = [
+
+                video.movie_name,
+                video.file_name,
+                video.language,
+                video.genre,
+                video.year,
+                video.caption,
+                video.short_code
+
+            ]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase();
+
+            return text.includes(query);
 
         });
 
+        renderVideos(filtered);
+
     });
+
+
+    function escapeHTML(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    // Load videos
+    loadVideos();
 
 
     // Monetag In-App Interstitial
-    show_11903209({
-        type: "inApp",
-        inAppSettings: {
-            frequency: 2,
-            capping: 0.1,
-            interval: 30,
-            timeout: 5,
-            everyPage: false
-        }
-    });
+    
+
+// In-App Interstitial
+
+show_11903209({
+  type: 'inApp',
+  inAppSettings: {
+    frequency: 2,
+    capping: 0.1,
+    interval: 30,
+    timeout: 5,
+    everyPage: false
+  }
+})
+
+/*
+This value is decoded as follows:
+- show automatically 2 ads
+  within 0.1 hours (6 minutes)
+  with a 30-second interval between them
+  and a 5-second delay before the first one is shown.
+  The last digit, 0, means that the session will be saved when you navigate between pages.
+  If you set the last digit as 1, then at any transition between pages,
+  the session will be reset, and the ads will start again.
+*/
+
+
 
 </script>
 
