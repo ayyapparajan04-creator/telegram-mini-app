@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Telegram App</title>
+
+    <!-- Telegram Mini App library -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 60px;
+            margin-top: 40px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: var(--tg-theme-hint-color, #777777);
+        }
+
+        .status {
+            margin-top: 30px;
+            padding: 15px;
+            border-radius: 12px;
+            background: var(--tg-theme-secondary-bg-color, #f2f2f2);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="logo">🎬</div>
+
+    <h1>My Video App</h1>
+
+    <p>Telegram Mini App</p>
+
+    <div class="status">
+        ✅ Mini App is working!
+    </div>
+
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+
+    // Tell Telegram that the Mini App is ready
+    tg.ready();
+
+    // Expand the Mini App
+    tg.expand();
+</script>
+
+</body>
+</html>
