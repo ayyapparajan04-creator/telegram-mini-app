@@ -57,11 +57,7 @@
         }
 
         .video-card {
-            background: var(
-                --tg-theme-secondary-bg-color,
-                #191c22
-            );
-
+            background: var(--tg-theme-secondary-bg-color, #191c22);
             border-radius: 18px;
             padding: 18px;
         }
@@ -100,11 +96,12 @@
             display: flex;
             justify-content: space-between;
             gap: 15px;
-
             padding: 10px 0;
 
-            border-bottom: 1px solid
-                var(--tg-theme-hint-color, #555);
+            border-bottom: 1px solid var(
+                --tg-theme-hint-color,
+                #555
+            );
 
             font-size: 14px;
         }
@@ -126,11 +123,42 @@
             word-break: break-word;
         }
 
-        .download-button {
-            display: block;
-            width: 100%;
-
+        .download-section {
             margin-top: 20px;
+            text-align: center;
+        }
+
+        .countdown {
+            padding: 14px;
+            border-radius: 14px;
+
+            background: var(
+                --tg-theme-bg-color,
+                #101216
+            );
+
+            color: var(
+                --tg-theme-hint-color,
+                #8b929e
+            );
+
+            font-size: 14px;
+        }
+
+        .countdown-number {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(
+                --tg-theme-text-color,
+                #ffffff
+            );
+
+            margin-bottom: 4px;
+        }
+
+        .download-button {
+            display: none;
+            width: 100%;
             padding: 15px;
 
             border-radius: 14px;
@@ -152,8 +180,8 @@
             font-weight: 700;
         }
 
-        .download-button:active {
-            opacity: 0.8;
+        .download-button.visible {
+            display: block;
         }
 
         .note {
@@ -238,23 +266,18 @@
 
 
     /* =========================
-       MAKE.COM WEBHOOK
+       SETTINGS
     ========================= */
 
     const MAKE_WEBHOOK_URL =
         "https://hook.eu1.make.com/ud3xahsh42yybn9byb7pu8i7bzv7i4ra";
-
-
-    /* =========================
-       BOT
-    ========================= */
 
     const BOT_USERNAME =
         "Aa_ishh_bot";
 
 
     /* =========================
-       GET SHORT CODE
+       URL CODE
     ========================= */
 
     const params =
@@ -264,6 +287,21 @@
 
     const shortCode =
         params.get("code");
+
+
+    /* =========================
+       STATE
+    ========================= */
+
+    let videoLoaded = false;
+
+    let adStarted = false;
+
+    let countdownStarted = false;
+
+    let countdownFinished = false;
+
+    let countdownTimer = null;
 
 
     /* =========================
@@ -496,17 +534,36 @@
                     </div>
 
 
-                    <a
-                        class="download-button"
-                        href="${botLink}"
-                    >
-                        ⬇️ Download Video
-                    </a>
+                    <div class="download-section">
+
+                        <div
+                            id="countdown"
+                            class="countdown"
+                        >
+                            <div
+                                class="countdown-number"
+                            >
+                                Preparing...
+                            </div>
+
+                            Please wait
+                        </div>
 
 
-                    <div class="note">
-                        Tap the button above to
-                        receive the video in Telegram.
+                        <a
+                            id="downloadButton"
+                            class="download-button"
+                            href="${botLink}"
+                        >
+                            ⬇️ Download Video
+                        </a>
+
+
+                        <div class="note">
+                            Your video will be sent
+                            directly in Telegram.
+                        </div>
+
                     </div>
 
                 </div>
@@ -514,13 +571,17 @@
             `;
 
 
-            /* =========================
-               MONETAG
-            ========================= */
+            videoLoaded = true;
+
+
+            /*
+                Wait 3 seconds before
+                triggering Monetag.
+            */
 
             setTimeout(
-                showAd,
-                1000
+                startAd,
+                3000
             );
 
 
@@ -552,10 +613,22 @@
 
 
     /* =========================
-       MONETAG
+       START MONETAG
     ========================= */
 
-    function showAd() {
+    function startAd() {
+
+        if (adStarted) {
+            return;
+        }
+
+        adStarted = true;
+
+
+        console.log(
+            "Starting Monetag ad..."
+        );
+
 
         try {
 
@@ -584,16 +657,233 @@
 
                 });
 
+            } else {
+
+                /*
+                    If Monetag hasn't loaded,
+                    don't leave the user stuck.
+                */
+
+                startCountdown();
+
             }
 
         } catch (error) {
 
             console.log(
-                "Monetag:",
+                "Monetag error:",
                 error
             );
 
+            startCountdown();
+
         }
+
+
+        /*
+            Give the ad time to open.
+
+            The countdown starts when the
+            page becomes visible again.
+        */
+
+        waitForAdReturn();
+
+    }
+
+
+    /* =========================
+       WAIT FOR USER TO RETURN
+    ========================= */
+
+    function waitForAdReturn() {
+
+        let returned = false;
+
+
+        function checkReturn() {
+
+            if (returned) {
+                return;
+            }
+
+
+            /*
+                The Mini App becomes visible
+                again after the ad closes.
+            */
+
+            if (
+                document.visibilityState ===
+                "visible"
+            ) {
+
+                /*
+                    Don't immediately start
+                    because the ad can briefly
+                    return to visible state.
+
+                    Give it a short settling
+                    period.
+                */
+
+                setTimeout(() => {
+
+                    if (
+                        document.visibilityState ===
+                        "visible"
+                    ) {
+
+                        returned = true;
+
+                        document.removeEventListener(
+                            "visibilitychange",
+                            checkReturn
+                        );
+
+                        startCountdown();
+
+                    }
+
+                }, 500);
+
+            }
+
+        }
+
+
+        document.addEventListener(
+            "visibilitychange",
+            checkReturn
+        );
+
+
+        /*
+            Fallback for ad formats that
+            don't change page visibility.
+
+            After 8 seconds from ad trigger,
+            begin the countdown if it hasn't
+            already started.
+        */
+
+        setTimeout(() => {
+
+            if (!returned) {
+
+                returned = true;
+
+                document.removeEventListener(
+                    "visibilitychange",
+                    checkReturn
+                );
+
+                startCountdown();
+
+            }
+
+        }, 8000);
+
+    }
+
+
+    /* =========================
+       COUNTDOWN
+    ========================= */
+
+    function startCountdown() {
+
+        if (
+            countdownStarted ||
+            countdownFinished
+        ) {
+
+            return;
+        }
+
+
+        countdownStarted = true;
+
+
+        const countdown =
+            document.getElementById(
+                "countdown"
+            );
+
+
+        const downloadButton =
+            document.getElementById(
+                "downloadButton"
+            );
+
+
+        if (
+            !countdown ||
+            !downloadButton
+        ) {
+
+            return;
+        }
+
+
+        let seconds = 5;
+
+
+        countdown.innerHTML = `
+
+            <div class="countdown-number">
+                ${seconds}
+            </div>
+
+            Preparing your download...
+
+        `;
+
+
+        countdownTimer =
+            setInterval(() => {
+
+                seconds--;
+
+
+                if (
+                    seconds > 0
+                ) {
+
+                    countdown.innerHTML = `
+
+                        <div
+                            class="countdown-number"
+                        >
+                            ${seconds}
+                        </div>
+
+                        Preparing your
+                        download...
+
+                    `;
+
+                } else {
+
+                    clearInterval(
+                        countdownTimer
+                    );
+
+
+                    countdownFinished = true;
+
+
+                    countdown.style.display =
+                        "none";
+
+
+                    downloadButton.classList.add(
+                        "visible"
+                    );
+
+                }
+
+            }, 1000);
 
     }
 
