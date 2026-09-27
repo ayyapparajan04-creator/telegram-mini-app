@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -24,7 +25,7 @@
 
         body {
             margin: 0;
-            padding: 20px;
+            padding: 18px;
             font-family: Arial, sans-serif;
             background: var(--tg-theme-bg-color, #ffffff);
             color: var(--tg-theme-text-color, #111111);
@@ -37,15 +38,15 @@
 
         .header {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .logo {
-            font-size: 50px;
+            font-size: 48px;
         }
 
         h1 {
-            margin: 8px 0;
+            margin: 6px 0;
             font-size: 24px;
         }
 
@@ -55,56 +56,61 @@
         }
 
         .card {
-            padding: 20px;
-            border-radius: 16px;
             background: var(
                 --tg-theme-secondary-bg-color,
                 #f2f2f2
             );
-            margin-top: 15px;
+
+            border-radius: 16px;
+            padding: 18px;
+            margin-top: 14px;
         }
 
-        .label {
-            font-size: 13px;
-            color: var(--tg-theme-hint-color, #777777);
-            margin-bottom: 6px;
-        }
-
-        .value {
-            font-size: 16px;
+        .title {
+            font-size: 18px;
             font-weight: bold;
+            line-height: 1.4;
             word-break: break-word;
         }
 
-        .status {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 12px;
-            background: var(
-                --tg-theme-secondary-bg-color,
-                #f2f2f2
-            );
-            text-align: center;
+        .info {
+            margin-top: 12px;
+            color: var(--tg-theme-hint-color, #777777);
+            font-size: 14px;
+            line-height: 1.8;
         }
 
-        .success {
-            color: #16803c;
+        .download-btn {
+            display: block;
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px;
+            border-radius: 13px;
+
+            background: var(
+                --tg-theme-button-color,
+                #2481cc
+            );
+
+            color: var(
+                --tg-theme-button-text-color,
+                #ffffff
+            );
+
+            text-decoration: none;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .status {
+            text-align: center;
+            padding: 25px 10px;
+            color: var(--tg-theme-hint-color, #777777);
         }
 
         .error {
             color: #d33;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 30px 10px;
-            color: var(--tg-theme-hint-color, #777777);
-        }
-
-        .code {
-            font-family: monospace;
-            font-size: 18px;
-            word-break: break-all;
         }
     </style>
 </head>
@@ -120,16 +126,15 @@
         <h1>My Video App</h1>
 
         <div class="subtitle">
-            Specific Video Test
+            Your requested video
         </div>
 
     </div>
 
-
     <div id="content">
 
-        <div class="loading">
-            Connecting to Make.com...
+        <div class="status">
+            Loading video...
         </div>
 
     </div>
@@ -146,7 +151,7 @@
 
 
     /*
-        YOUR EXISTING MAKE.COM WEBHOOK
+        YOUR MAKE.COM WEBHOOK
     */
 
     const MAKE_WEBHOOK_URL =
@@ -154,235 +159,281 @@
 
 
     /*
-        TEMPORARY TEST CODE
+        YOUR TELEGRAM BOT
 
-        We are testing with one specific video.
-
-        Later this will automatically come from:
-
-        ?code=dae2c6ce
+        The bot username is:
+        @Aa_ishh_bot
     */
 
-    const TEST_SHORT_CODE = "dae2c6ce";
+    const BOT_USERNAME = "Aa_ishh_bot";
+
+
+    /*
+        READ THE CODE FROM THE URL
+
+        Example:
+
+        ?code=dae2c6ce
+
+        becomes:
+
+        dae2c6ce
+    */
+
+    const urlParams = new URLSearchParams(
+        window.location.search
+    );
+
+    const shortCode = urlParams.get("code");
 
 
     async function loadSpecificVideo() {
 
-        const content = document.getElementById("content");
+        const content =
+            document.getElementById("content");
+
+
+        /*
+            Make sure a code was supplied.
+        */
+
+        if (!shortCode) {
+
+            content.innerHTML = `
+                <div class="status error">
+                    ❌ No video code was provided.
+                </div>
+            `;
+
+            return;
+        }
 
 
         try {
 
             /*
-                Send ONLY the short code to Make.com.
+                Send the specific short code
+                to Make.com.
             */
 
-            const response = await fetch(MAKE_WEBHOOK_URL, {
+            const response = await fetch(
+                MAKE_WEBHOOK_URL,
+                {
+                    method: "POST",
 
-                method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-                    short_code: TEST_SHORT_CODE
-                })
-
-            });
+                    body: JSON.stringify({
+                        short_code: shortCode
+                    })
+                }
+            );
 
 
-            /*
-                Read Make.com's response.
-            */
+            const responseText =
+                await response.text();
 
-            const responseText = await response.text();
 
             console.log(
-                "Make.com response:",
+                "Make response:",
                 responseText
             );
 
 
-            /*
-                Try to parse JSON.
-            */
-
             let data;
+
 
             try {
 
-                data = JSON.parse(responseText);
+                data =
+                    JSON.parse(responseText);
 
             } catch (error) {
 
                 throw new Error(
-                    "Make.com returned invalid JSON."
+                    "Invalid response from Make.com."
                 );
 
             }
 
 
             /*
-                Display the response we received.
+                Make must return success.
             */
 
-            if (data.success === true) {
+            if (data.success !== true) {
 
-                const video = data.video || data.videos?.[0];
-
-
-                if (!video) {
-
-                    content.innerHTML = `
-                        <div class="status error">
-                            ❌ No video was returned.
-                        </div>
-                    `;
-
-                    return;
-                }
-
-
-                const title =
-                    video.movie_name ||
-                    video.file_name ||
-                    "Untitled Video";
-
-
-                content.innerHTML = `
-
-                    <div class="card">
-
-                        <div class="label">
-                            Video
-                        </div>
-
-                        <div class="value">
-                            ${escapeHTML(title)}
-                        </div>
-
-                    </div>
-
-
-                    <div class="card">
-
-                        <div class="label">
-                            Short Code
-                        </div>
-
-                        <div class="value code">
-                            ${escapeHTML(
-                                video.short_code || TEST_SHORT_CODE
-                            )}
-                        </div>
-
-                    </div>
-
-
-                    <div class="card">
-
-                        <div class="label">
-                            File Size
-                        </div>
-
-                        <div class="value">
-                            ${formatFileSize(video.file_size)}
-                        </div>
-
-                    </div>
-
-
-                    <div class="card">
-
-                        <div class="label">
-                            Language
-                        </div>
-
-                        <div class="value">
-                            ${escapeHTML(
-                                video.language || "Not specified"
-                            )}
-                        </div>
-
-                    </div>
-
-
-                    <div class="status success">
-
-                        ✅ Specific video loaded
-
-                    </div>
-
-                `;
-
-
-                /*
-                    Monetag ad
-                */
-
-                setTimeout(() => {
-
-                    try {
-
-                        if (
-                            typeof show_11903209 ===
-                            "function"
-                        ) {
-
-                            show_11903209({
-
-                                type: "inApp",
-
-                                inAppSettings: {
-
-                                    frequency: 2,
-
-                                    capping: 0.1,
-
-                                    interval: 30,
-
-                                    timeout: 5,
-
-                                    everyPage: false
-
-                                }
-
-                            });
-
-                        }
-
-                    } catch (adError) {
-
-                        console.log(
-                            "Monetag error:",
-                            adError
-                        );
-
-                    }
-
-                }, 1000);
-
-
-            } else {
-
-                content.innerHTML = `
-
-                    <div class="status error">
-
-                        ❌ Make.com did not return
-                        success: true.
-
-                    </div>
-
-                `;
-
-                console.log(
-                    "Make data:",
-                    data
+                throw new Error(
+                    "Video was not found."
                 );
 
             }
+
+
+            /*
+                Support either:
+                data.video
+                OR
+                data.videos[0]
+            */
+
+            const video =
+                data.video ||
+                (
+                    Array.isArray(data.videos)
+                        ? data.videos[0]
+                        : null
+                );
+
+
+            if (!video) {
+
+                throw new Error(
+                    "No video was found for this code."
+                );
+
+            }
+
+
+            const title =
+                video.movie_name ||
+                video.file_name ||
+                "Untitled Video";
+
+
+            const language =
+                video.language ||
+                "Not specified";
+
+
+            const year =
+                video.year ||
+                "";
+
+
+            const genre =
+                video.genre ||
+                "";
+
+
+            const size =
+                formatFileSize(
+                    video.file_size
+                );
+
+
+            /*
+                Telegram deep link.
+
+                Example:
+
+                https://t.me/Aa_ishh_bot?start=dae2c6ce
+            */
+
+            const botLink =
+                "https://t.me/" +
+                BOT_USERNAME +
+                "?start=" +
+                encodeURIComponent(
+                    video.short_code ||
+                    shortCode
+                );
+
+
+            /*
+                Display ONLY this video.
+            */
+
+            content.innerHTML = `
+
+                <div class="card">
+
+                    <div class="title">
+                        ${escapeHTML(title)}
+                    </div>
+
+                    <div class="info">
+
+                        ${year
+                            ? `📅 ${escapeHTML(year)}<br>`
+                            : ""
+                        }
+
+                        🌐 ${escapeHTML(language)}
+                        <br>
+
+                        💾 ${escapeHTML(size)}
+
+                        ${genre
+                            ? `<br>🎭 ${escapeHTML(genre)}`
+                            : ""
+                        }
+
+                    </div>
+
+
+                    <a
+                        class="download-btn"
+                        href="${botLink}"
+                    >
+                        ⬇️ Download
+                    </a>
+
+                </div>
+
+            `;
+
+
+            /*
+                Show Monetag ad after
+                the video has loaded.
+            */
+
+            setTimeout(() => {
+
+                try {
+
+                    if (
+                        typeof show_11903209 ===
+                        "function"
+                    ) {
+
+                        show_11903209({
+
+                            type: "inApp",
+
+                            inAppSettings: {
+
+                                frequency: 2,
+
+                                capping: 0.1,
+
+                                interval: 30,
+
+                                timeout: 5,
+
+                                everyPage: false
+
+                            }
+
+                        });
+
+                    }
+
+                } catch (error) {
+
+                    console.log(
+                        "Monetag error:",
+                        error
+                    );
+
+                }
+
+            }, 1000);
+
 
         } catch (error) {
 
@@ -393,11 +444,9 @@
 
                 <div class="status error">
 
-                    ❌ Unable to connect to Make.com.
-
-                    <br><br>
-
-                    ${escapeHTML(error.message)}
+                    ❌ ${escapeHTML(
+                        error.message
+                    )}
 
                 </div>
 
@@ -502,7 +551,7 @@
 
 
     /*
-        Start the test.
+        Start loading.
     */
 
     loadSpecificVideo();
@@ -510,5 +559,6 @@
 </script>
 
 </body>
+
 </html>
 ```
