@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>My Video App</title>
+    <title>Video App</title>
 
     <!-- Telegram Mini App -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -24,67 +24,116 @@
 
         body {
             margin: 0;
-            padding: 18px;
             font-family: Arial, sans-serif;
-            background: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #111111);
+            background: var(--tg-theme-bg-color, #0f1115);
+            color: var(--tg-theme-text-color, #ffffff);
         }
 
-        .container {
-            max-width: 600px;
+        .app {
+            max-width: 620px;
             margin: auto;
+            padding: 16px;
         }
 
-        .header {
+        .top {
             text-align: center;
-            margin-bottom: 20px;
+            padding: 12px 0 20px;
         }
 
         .logo {
             font-size: 48px;
+            margin-bottom: 5px;
         }
 
-        h1 {
-            margin: 6px 0;
+        .app-title {
             font-size: 24px;
+            font-weight: 700;
         }
 
-        .subtitle {
-            color: var(--tg-theme-hint-color, #777777);
+        .app-subtitle {
+            margin-top: 5px;
+            color: var(--tg-theme-hint-color, #8b929e);
             font-size: 14px;
         }
 
-        .card {
+        .video-card {
             background: var(
                 --tg-theme-secondary-bg-color,
-                #f2f2f2
+                #191c22
             );
 
-            border-radius: 16px;
+            border-radius: 18px;
             padding: 18px;
-            margin-top: 14px;
         }
 
-        .title {
-            font-size: 18px;
-            font-weight: bold;
-            line-height: 1.4;
+        .video-icon {
+            width: 100%;
+            height: 150px;
+            border-radius: 14px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: linear-gradient(
+                135deg,
+                #20242c,
+                #111318
+            );
+
+            font-size: 60px;
+            margin-bottom: 18px;
+        }
+
+        .movie-title {
+            font-size: 21px;
+            font-weight: 700;
+            line-height: 1.35;
             word-break: break-word;
         }
 
-        .info {
-            margin-top: 12px;
-            color: var(--tg-theme-hint-color, #777777);
-            font-size: 14px;
-            line-height: 1.8;
+        .details {
+            margin-top: 15px;
         }
 
-        .download-btn {
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+
+            padding: 10px 0;
+
+            border-bottom: 1px solid
+                var(--tg-theme-hint-color, #555);
+
+            font-size: 14px;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: var(
+                --tg-theme-hint-color,
+                #8b929e
+            );
+        }
+
+        .detail-value {
+            text-align: right;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .download-button {
             display: block;
             width: 100%;
-            margin-top: 18px;
-            padding: 14px;
-            border-radius: 13px;
+
+            margin-top: 20px;
+            padding: 15px;
+
+            border-radius: 14px;
 
             background: var(
                 --tg-theme-button-color,
@@ -98,44 +147,83 @@
 
             text-decoration: none;
             text-align: center;
-            font-size: 16px;
-            font-weight: bold;
+
+            font-size: 17px;
+            font-weight: 700;
         }
 
-        .status {
+        .download-button:active {
+            opacity: 0.8;
+        }
+
+        .note {
             text-align: center;
-            padding: 25px 10px;
-            color: var(--tg-theme-hint-color, #777777);
+            margin-top: 14px;
+
+            color: var(
+                --tg-theme-hint-color,
+                #8b929e
+            );
+
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .loading,
+        .error {
+            text-align: center;
+            padding: 50px 15px;
         }
 
         .error {
-            color: #d33;
+            color: #ff6b6b;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 22px;
+
+            color: var(
+                --tg-theme-hint-color,
+                #8b929e
+            );
+
+            font-size: 11px;
         }
     </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="app">
 
-    <div class="header">
+    <div class="top">
 
         <div class="logo">🎬</div>
 
-        <h1>My Video App</h1>
+        <div class="app-title">
+            Video App
+        </div>
 
-        <div class="subtitle">
-            Your requested video
+        <div class="app-subtitle">
+            Watch & Download
         </div>
 
     </div>
 
+
     <div id="content">
 
-        <div class="status">
+        <div class="loading">
+            ⏳<br><br>
             Loading video...
         </div>
 
+    </div>
+
+
+    <div class="footer">
+        Powered by Telegram Mini App
     </div>
 
 </div>
@@ -149,58 +237,56 @@
     tg.expand();
 
 
-    /*
-        YOUR MAKE.COM WEBHOOK
-    */
+    /* =========================
+       MAKE.COM WEBHOOK
+    ========================= */
 
     const MAKE_WEBHOOK_URL =
         "https://hook.eu1.make.com/ud3xahsh42yybn9byb7pu8i7bzv7i4ra";
 
 
-    /*
-        YOUR TELEGRAM BOT
+    /* =========================
+       BOT
+    ========================= */
 
-        The bot username is:
-        @Aa_ishh_bot
-    */
-
-    const BOT_USERNAME = "Aa_ishh_bot";
+    const BOT_USERNAME =
+        "Aa_ishh_bot";
 
 
-    /*
-        READ THE CODE FROM THE URL
+    /* =========================
+       GET SHORT CODE
+    ========================= */
 
-        Example:
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
 
-        ?code=dae2c6ce
-
-        becomes:
-
-        dae2c6ce
-    */
-
-    const urlParams = new URLSearchParams(
-        window.location.search
-    );
-
-    const shortCode = urlParams.get("code");
+    const shortCode =
+        params.get("code");
 
 
-    async function loadSpecificVideo() {
+    /* =========================
+       LOAD VIDEO
+    ========================= */
+
+    async function loadVideo() {
 
         const content =
-            document.getElementById("content");
+            document.getElementById(
+                "content"
+            );
 
-
-        /*
-            Make sure a code was supplied.
-        */
 
         if (!shortCode) {
 
             content.innerHTML = `
-                <div class="status error">
-                    ❌ No video code was provided.
+                <div class="error">
+                    ❌<br><br>
+                    No video selected.
+                    <br><br>
+                    Please open the video
+                    link from Telegram.
                 </div>
             `;
 
@@ -210,26 +296,24 @@
 
         try {
 
-            /*
-                Send the specific short code
-                to Make.com.
-            */
+            const response =
+                await fetch(
+                    MAKE_WEBHOOK_URL,
+                    {
+                        method: "POST",
 
-            const response = await fetch(
-                MAKE_WEBHOOK_URL,
-                {
-                    method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        short_code: shortCode
-                    })
-                }
-            );
+                        body:
+                            JSON.stringify({
+                                short_code:
+                                    shortCode
+                            })
+                    }
+                );
 
 
             const responseText =
@@ -242,47 +326,29 @@
             );
 
 
-            let data;
+            const data =
+                JSON.parse(
+                    responseText
+                );
 
 
-            try {
-
-                data =
-                    JSON.parse(responseText);
-
-            } catch (error) {
+            if (
+                data.success !== true
+            ) {
 
                 throw new Error(
-                    "Invalid response from Make.com."
+                    "Video not found."
                 );
 
             }
 
-
-            /*
-                Make must return success.
-            */
-
-            if (data.success !== true) {
-
-                throw new Error(
-                    "Video was not found."
-                );
-
-            }
-
-
-            /*
-                Support either:
-                data.video
-                OR
-                data.videos[0]
-            */
 
             const video =
                 data.video ||
                 (
-                    Array.isArray(data.videos)
+                    Array.isArray(
+                        data.videos
+                    )
                         ? data.videos[0]
                         : null
                 );
@@ -291,7 +357,7 @@
             if (!video) {
 
                 throw new Error(
-                    "No video was found for this code."
+                    "Video not found."
                 );
 
             }
@@ -305,7 +371,7 @@
 
             const language =
                 video.language ||
-                "Not specified";
+                "Unknown";
 
 
             const year =
@@ -324,127 +390,156 @@
                 );
 
 
-            /*
-                Telegram deep link.
+            const quality =
+                getQuality(
+                    video.file_name,
+                    video.caption
+                );
 
-                Example:
 
-                https://t.me/Aa_ishh_bot?start=dae2c6ce
-            */
+            const actualCode =
+                video.short_code ||
+                shortCode;
+
 
             const botLink =
                 "https://t.me/" +
                 BOT_USERNAME +
                 "?start=" +
                 encodeURIComponent(
-                    video.short_code ||
-                    shortCode
+                    actualCode
                 );
 
 
-            /*
-                Display ONLY this video.
-            */
-
             content.innerHTML = `
 
-                <div class="card">
+                <div class="video-card">
 
-                    <div class="title">
+                    <div class="video-icon">
+                        🎞️
+                    </div>
+
+                    <div class="movie-title">
                         ${escapeHTML(title)}
                     </div>
 
-                    <div class="info">
+                    <div class="details">
 
-                        ${year
-                            ? `📅 ${escapeHTML(year)}<br>`
-                            : ""
-                        }
+                        ${year ? `
+                        <div class="detail-row">
+                            <span class="detail-label">
+                                📅 Year
+                            </span>
 
-                        🌐 ${escapeHTML(language)}
-                        <br>
+                            <span class="detail-value">
+                                ${escapeHTML(year)}
+                            </span>
+                        </div>
+                        ` : ""}
 
-                        💾 ${escapeHTML(size)}
 
-                        ${genre
-                            ? `<br>🎭 ${escapeHTML(genre)}`
-                            : ""
-                        }
+                        <div class="detail-row">
+
+                            <span class="detail-label">
+                                🌐 Language
+                            </span>
+
+                            <span class="detail-value">
+                                ${escapeHTML(language)}
+                            </span>
+
+                        </div>
+
+
+                        ${quality ? `
+                        <div class="detail-row">
+
+                            <span class="detail-label">
+                                🎞️ Quality
+                            </span>
+
+                            <span class="detail-value">
+                                ${escapeHTML(quality)}
+                            </span>
+
+                        </div>
+                        ` : ""}
+
+
+                        ${genre ? `
+                        <div class="detail-row">
+
+                            <span class="detail-label">
+                                🎭 Genre
+                            </span>
+
+                            <span class="detail-value">
+                                ${escapeHTML(genre)}
+                            </span>
+
+                        </div>
+                        ` : ""}
+
+
+                        <div class="detail-row">
+
+                            <span class="detail-label">
+                                💾 Size
+                            </span>
+
+                            <span class="detail-value">
+                                ${escapeHTML(size)}
+                            </span>
+
+                        </div>
 
                     </div>
 
 
                     <a
-                        class="download-btn"
+                        class="download-button"
                         href="${botLink}"
                     >
-                        ⬇️ Download
+                        ⬇️ Download Video
                     </a>
+
+
+                    <div class="note">
+                        Tap the button above to
+                        receive the video in Telegram.
+                    </div>
 
                 </div>
 
             `;
 
 
-            /*
-                Show Monetag ad after
-                the video has loaded.
-            */
+            /* =========================
+               MONETAG
+            ========================= */
 
-            setTimeout(() => {
-
-                try {
-
-                    if (
-                        typeof show_11903209 ===
-                        "function"
-                    ) {
-
-                        show_11903209({
-
-                            type: "inApp",
-
-                            inAppSettings: {
-
-                                frequency: 2,
-
-                                capping: 0.1,
-
-                                interval: 30,
-
-                                timeout: 5,
-
-                                everyPage: false
-
-                            }
-
-                        });
-
-                    }
-
-                } catch (error) {
-
-                    console.log(
-                        "Monetag error:",
-                        error
-                    );
-
-                }
-
-            }, 1000);
+            setTimeout(
+                showAd,
+                1000
+            );
 
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                error
+            );
 
 
             content.innerHTML = `
 
-                <div class="status error">
+                <div class="error">
 
-                    ❌ ${escapeHTML(
-                        error.message
+                    ❌<br><br>
+
+                    ${escapeHTML(
+                        error.message ||
+                        "Unable to load video."
                     )}
 
                 </div>
@@ -456,7 +551,60 @@
     }
 
 
-    function formatFileSize(bytes) {
+    /* =========================
+       MONETAG
+    ========================= */
+
+    function showAd() {
+
+        try {
+
+            if (
+                typeof show_11903209 ===
+                "function"
+            ) {
+
+                show_11903209({
+
+                    type: "inApp",
+
+                    inAppSettings: {
+
+                        frequency: 2,
+
+                        capping: 0.1,
+
+                        interval: 30,
+
+                        timeout: 5,
+
+                        everyPage: false
+
+                    }
+
+                });
+
+            }
+
+        } catch (error) {
+
+            console.log(
+                "Monetag:",
+                error
+            );
+
+        }
+
+    }
+
+
+    /* =========================
+       FILE SIZE
+    ========================= */
+
+    function formatFileSize(
+        bytes
+    ) {
 
         if (
             bytes === null ||
@@ -470,7 +618,8 @@
         }
 
 
-        bytes = Number(bytes);
+        bytes =
+            Number(bytes);
 
 
         if (
@@ -481,7 +630,8 @@
             return (
                 bytes /
                 (1024 * 1024 * 1024)
-            ).toFixed(2) + " GB";
+            ).toFixed(2) +
+            " GB";
 
         }
 
@@ -494,7 +644,8 @@
             return (
                 bytes /
                 (1024 * 1024)
-            ).toFixed(2) + " MB";
+            ).toFixed(2) +
+            " MB";
 
         }
 
@@ -507,7 +658,8 @@
             return (
                 bytes /
                 1024
-            ).toFixed(2) + " KB";
+            ).toFixed(2) +
+            " KB";
 
         }
 
@@ -517,7 +669,63 @@
     }
 
 
-    function escapeHTML(value) {
+    /* =========================
+       QUALITY
+    ========================= */
+
+    function getQuality(
+        fileName,
+        caption
+    ) {
+
+        const text =
+            (
+                (fileName || "") +
+                " " +
+                (caption || "")
+            ).toLowerCase();
+
+
+        const qualities = [
+            "2160p",
+            "4k",
+            "1080p",
+            "720p",
+            "480p",
+            "360p"
+        ];
+
+
+        for (
+            const quality
+            of qualities
+        ) {
+
+            if (
+                text.includes(
+                    quality
+                )
+            ) {
+
+                return quality;
+
+            }
+
+        }
+
+
+        return "";
+
+    }
+
+
+    /* =========================
+       SECURITY
+    ========================= */
+
+    function escapeHTML(
+        value
+    ) {
 
         return String(value)
 
@@ -549,14 +757,13 @@
     }
 
 
-    /*
-        Start loading.
-    */
+    /* =========================
+       START
+    ========================= */
 
-    loadSpecificVideo();
+    loadVideo();
 
 </script>
 
 </body>
-
 </html>
