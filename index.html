@@ -762,58 +762,22 @@
     // ==============================
 
     downloadBtn.addEventListener(
-        "click",
-        function() {
+    "click",
+    function () {
 
-            if (!actualCode) {
+        alert("DOWNLOAD BUTTON CLICKED");
 
-                errorMessage.textContent =
-                    "Video code is missing.";
+        const botLink =
+            "https://t.me/" +
+            BOT_USERNAME +
+            "?start=" +
+            encodeURIComponent(actualCode);
 
-                return;
+        alert(botLink);
 
-            }
-
-
-            const botLink =
-                "https://t.me/" +
-                BOT_USERNAME +
-                "?start=" +
-                encodeURIComponent(
-                    actualCode
-                );
-
-
-            console.log(
-                "Opening Telegram bot:",
-                botLink
-            );
-
-
-            // Open directly inside Telegram
-            if (
-                window.Telegram &&
-                window.Telegram.WebApp &&
-                typeof window.Telegram.WebApp
-                    .openTelegramLink ===
-                    "function"
-            ) {
-
-                window.Telegram.WebApp
-                    .openTelegramLink(
-                        botLink
-                    );
-
-            } else {
-
-                // Fallback
-                window.location.href =
-                    botLink;
-
-            }
-
-        }
-    );
+        window.Telegram.WebApp.openTelegramLink(botLink);
+    }
+);
 
 
     // ==============================
