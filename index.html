@@ -647,11 +647,15 @@
                 );
 
 
-            downloadBtn.addEventListener("click", function () {
+            downloadBtn.addEventListener("click", function ()
+            {
                 const botLink =
                     "https://t.me/Aa_ishh_bot?start=" +
                     encodeURIComponent(actualCode);
-                window.open(botLink, "_blank");
+                if (window.Telegram && window.Telegram.WebApp)
+            {
+            window.Telegram.WebApp.openTelegramLink(botLink);
+                }
             });
 
             /*
