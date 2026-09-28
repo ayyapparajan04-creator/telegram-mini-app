@@ -647,16 +647,15 @@
                 );
 
 
-            downloadBtn.addEventListener("click", function ()
-            {
-                const botLink =
-                    "https://t.me/Aa_ishh_bot?start=" +
-                    encodeURIComponent(actualCode);
-                if (window.Telegram && window.Telegram.WebApp)
-            {
-            window.Telegram.WebApp.openTelegramLink(botLink);
-                }
-            });
+            downloadBtn.addEventListener("click", function () {
+    const botLink =
+        "https://t.me/Aa_ishh_bot?start=" +
+        encodeURIComponent(actualCode);
+
+    if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.openTelegramLink(botLink);
+    }
+});
 
             /*
              * Start Monetag after
