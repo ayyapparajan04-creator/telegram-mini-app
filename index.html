@@ -66,17 +66,10 @@
             width: 100%;
             height: 150px;
             border-radius: 14px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
-            background: linear-gradient(
-                135deg,
-                #20242c,
-                #111318
-            );
-
+            background: linear-gradient(135deg, #20242c, #111318);
             font-size: 60px;
             margin-bottom: 18px;
         }
@@ -97,12 +90,7 @@
             justify-content: space-between;
             gap: 15px;
             padding: 10px 0;
-
-            border-bottom: 1px solid var(
-                --tg-theme-hint-color,
-                #555
-            );
-
+            border-bottom: 1px solid var(--tg-theme-hint-color, #555);
             font-size: 14px;
         }
 
@@ -111,10 +99,7 @@
         }
 
         .detail-label {
-            color: var(
-                --tg-theme-hint-color,
-                #8b929e
-            );
+            color: var(--tg-theme-hint-color, #8b929e);
         }
 
         .detail-value {
@@ -131,28 +116,15 @@
         .countdown {
             padding: 14px;
             border-radius: 14px;
-
-            background: var(
-                --tg-theme-bg-color,
-                #101216
-            );
-
-            color: var(
-                --tg-theme-hint-color,
-                #8b929e
-            );
-
+            background: var(--tg-theme-bg-color, #101216);
+            color: var(--tg-theme-hint-color, #8b929e);
             font-size: 14px;
         }
 
         .countdown-number {
             font-size: 26px;
             font-weight: 700;
-            color: var(
-                --tg-theme-text-color,
-                #ffffff
-            );
-
+            color: var(--tg-theme-text-color, #ffffff);
             margin-bottom: 4px;
         }
 
@@ -160,24 +132,15 @@
             display: none;
             width: 100%;
             padding: 15px;
-
             border-radius: 14px;
-
-            background: var(
-                --tg-theme-button-color,
-                #2481cc
-            );
-
-            color: var(
-                --tg-theme-button-text-color,
-                #ffffff
-            );
-
-            text-decoration: none;
+            border: none;
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
             text-align: center;
-
             font-size: 17px;
             font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
         }
 
         .download-button.visible {
@@ -187,12 +150,7 @@
         .note {
             text-align: center;
             margin-top: 14px;
-
-            color: var(
-                --tg-theme-hint-color,
-                #8b929e
-            );
-
+            color: var(--tg-theme-hint-color, #8b929e);
             font-size: 12px;
             line-height: 1.5;
         }
@@ -210,12 +168,7 @@
         .footer {
             text-align: center;
             margin-top: 22px;
-
-            color: var(
-                --tg-theme-hint-color,
-                #8b929e
-            );
-
+            color: var(--tg-theme-hint-color, #8b929e);
             font-size: 11px;
         }
     </style>
@@ -226,7 +179,6 @@
 <div class="app">
 
     <div class="top">
-
         <div class="logo">🎬</div>
 
         <div class="app-title">
@@ -236,19 +188,17 @@
         <div class="app-subtitle">
             Watch & Download
         </div>
-
     </div>
-
 
     <div id="content">
 
         <div class="loading">
-            ⏳<br><br>
+            ⏳
+            <br><br>
             Loading video...
         </div>
 
     </div>
-
 
     <div class="footer">
         Powered by Telegram Mini App
@@ -259,26 +209,35 @@
 
 <script>
 
+    /* ==========================================
+       TELEGRAM MINI APP
+    ========================================== */
+
     const tg = window.Telegram.WebApp;
 
     tg.ready();
     tg.expand();
 
 
-    /* =========================
-       SETTINGS
-    ========================= */
+    /* ==========================================
+       MAKE WEBHOOK
+    ========================================== */
 
     const MAKE_WEBHOOK_URL =
         "https://hook.eu1.make.com/ud3xahsh42yybn9byb7pu8i7bzv7i4ra";
+
+
+    /* ==========================================
+       TELEGRAM BOT
+    ========================================== */
 
     const BOT_USERNAME =
         "Aa_ishh_bot";
 
 
-    /* =========================
-       URL CODE
-    ========================= */
+    /* ==========================================
+       GET SHORT CODE
+    ========================================== */
 
     const params =
         new URLSearchParams(
@@ -289,9 +248,9 @@
         params.get("code");
 
 
-    /* =========================
+    /* ==========================================
        STATE
-    ========================= */
+    ========================================== */
 
     let videoLoaded = false;
 
@@ -304,9 +263,9 @@
     let countdownTimer = null;
 
 
-    /* =========================
+    /* ==========================================
        LOAD VIDEO
-    ========================= */
+    ========================================== */
 
     async function loadVideo() {
 
@@ -320,7 +279,8 @@
 
             content.innerHTML = `
                 <div class="error">
-                    ❌<br><br>
+                    ❌
+                    <br><br>
                     No video selected.
                     <br><br>
                     Please open the video
@@ -401,6 +361,10 @@
             }
 
 
+            /* ==========================================
+               VIDEO DETAILS
+            ========================================== */
+
             const title =
                 video.movie_name ||
                 video.file_name ||
@@ -440,6 +404,10 @@
                 shortCode;
 
 
+            /* ==========================================
+               TELEGRAM BOT DEEP LINK
+            ========================================== */
+
             const botLink =
                 "https://t.me/" +
                 BOT_USERNAME +
@@ -449,6 +417,16 @@
                 );
 
 
+            console.log(
+                "Telegram bot link:",
+                botLink
+            );
+
+
+            /* ==========================================
+               DISPLAY VIDEO
+            ========================================== */
+
             content.innerHTML = `
 
                 <div class="video-card">
@@ -457,14 +435,19 @@
                         🎞️
                     </div>
 
+
                     <div class="movie-title">
                         ${escapeHTML(title)}
                     </div>
 
+
                     <div class="details">
 
-                        ${year ? `
+                        ${
+                            year
+                                ? `
                         <div class="detail-row">
+
                             <span class="detail-label">
                                 📅 Year
                             </span>
@@ -472,8 +455,11 @@
                             <span class="detail-value">
                                 ${escapeHTML(year)}
                             </span>
+
                         </div>
-                        ` : ""}
+                        `
+                                : ""
+                        }
 
 
                         <div class="detail-row">
@@ -489,7 +475,9 @@
                         </div>
 
 
-                        ${quality ? `
+                        ${
+                            quality
+                                ? `
                         <div class="detail-row">
 
                             <span class="detail-label">
@@ -501,10 +489,14 @@
                             </span>
 
                         </div>
-                        ` : ""}
+                        `
+                                : ""
+                        }
 
 
-                        ${genre ? `
+                        ${
+                            genre
+                                ? `
                         <div class="detail-row">
 
                             <span class="detail-label">
@@ -516,7 +508,9 @@
                             </span>
 
                         </div>
-                        ` : ""}
+                        `
+                                : ""
+                        }
 
 
                         <div class="detail-row">
@@ -536,32 +530,37 @@
 
                     <div class="download-section">
 
+
                         <div
                             id="countdown"
                             class="countdown"
                         >
-                            <div
-                                class="countdown-number"
-                            >
+
+                            <div class="countdown-number">
                                 Preparing...
                             </div>
 
                             Please wait
+
                         </div>
 
 
-                        <a
+                        <button
                             id="downloadButton"
                             class="download-button"
-                            href="${botLink}"
+                            type="button"
                         >
+
                             ⬇️ Download Video
-                        </a>
+
+                        </button>
 
 
                         <div class="note">
+
                             Your video will be sent
                             directly in Telegram.
+
                         </div>
 
                     </div>
@@ -571,21 +570,85 @@
             `;
 
 
+            /* ==========================================
+               DOWNLOAD BUTTON
+            ========================================== */
+
+            const downloadButton =
+                document.getElementById(
+                    "downloadButton"
+                );
+
+
+            downloadButton.addEventListener(
+                "click",
+                function () {
+
+                    console.log(
+                        "Download button clicked"
+                    );
+
+
+                    /*
+                     * Use Telegram's native
+                     * Mini App method.
+                     */
+
+                    if (
+                        window.Telegram &&
+                        window.Telegram.WebApp &&
+                        typeof
+                        window.Telegram.WebApp
+                            .openTelegramLink ===
+                            "function"
+                    ) {
+
+                        console.log(
+                            "Opening Telegram link using openTelegramLink"
+                        );
+
+
+                        window.Telegram.WebApp
+                            .openTelegramLink(
+                                botLink
+                            );
+
+                    } else {
+
+                        /*
+                         * Fallback for testing
+                         * outside Telegram.
+                         */
+
+                        console.log(
+                            "openTelegramLink unavailable, using normal navigation"
+                        );
+
+
+                        window.location.href =
+                            botLink;
+
+                    }
+
+                }
+            );
+
+
             videoLoaded = true;
 
 
-            /*
-                Wait 3 seconds before
-                triggering Monetag.
-            */
+            /* ==========================================
+               START AD AFTER 3 SECONDS
+            ========================================== */
 
             setTimeout(
                 startAd,
                 3000
             );
 
+        }
 
-        } catch (error) {
+        catch (error) {
 
             console.error(
                 error
@@ -596,7 +659,8 @@
 
                 <div class="error">
 
-                    ❌<br><br>
+                    ❌
+                    <br><br>
 
                     ${escapeHTML(
                         error.message ||
@@ -612,15 +676,16 @@
     }
 
 
-    /* =========================
-       START MONETAG
-    ========================= */
+    /* ==========================================
+       START MONETAG AD
+    ========================================== */
 
     function startAd() {
 
         if (adStarted) {
             return;
         }
+
 
         adStarted = true;
 
@@ -657,18 +722,21 @@
 
                 });
 
-            } else {
+            }
 
-                /*
-                    If Monetag hasn't loaded,
-                    don't leave the user stuck.
-                */
+            else {
+
+                console.log(
+                    "Monetag SDK unavailable."
+                );
 
                 startCountdown();
 
             }
 
-        } catch (error) {
+        }
+
+        catch (error) {
 
             console.log(
                 "Monetag error:",
@@ -681,20 +749,18 @@
 
 
         /*
-            Give the ad time to open.
-
-            The countdown starts when the
-            page becomes visible again.
-        */
+         * Wait for the user to return
+         * from the advertisement.
+         */
 
         waitForAdReturn();
 
     }
 
 
-    /* =========================
-       WAIT FOR USER TO RETURN
-    ========================= */
+    /* ==========================================
+       WAIT FOR AD RETURN
+    ========================================== */
 
     function waitForAdReturn() {
 
@@ -708,44 +774,40 @@
             }
 
 
-            /*
-                The Mini App becomes visible
-                again after the ad closes.
-            */
-
             if (
                 document.visibilityState ===
                 "visible"
             ) {
 
-                /*
-                    Don't immediately start
-                    because the ad can briefly
-                    return to visible state.
+                setTimeout(
+                    function () {
 
-                    Give it a short settling
-                    period.
-                */
+                        if (
+                            document.visibilityState ===
+                            "visible"
+                        ) {
 
-                setTimeout(() => {
+                            returned = true;
 
-                    if (
-                        document.visibilityState ===
-                        "visible"
-                    ) {
 
-                        returned = true;
+                            document.removeEventListener(
+                                "visibilitychange",
+                                checkReturn
+                            );
 
-                        document.removeEventListener(
-                            "visibilitychange",
-                            checkReturn
-                        );
 
-                        startCountdown();
+                            console.log(
+                                "Returned from ad."
+                            );
 
-                    }
 
-                }, 500);
+                            startCountdown();
+
+                        }
+
+                    },
+                    500
+                );
 
             }
 
@@ -759,108 +821,99 @@
 
 
         /*
-            Fallback for ad formats that
-            don't change page visibility.
+         * Fallback.
+         *
+         * If the ad doesn't trigger a
+         * visibility change, don't leave
+         * the user stuck forever.
+         */
 
-            After 8 seconds from ad trigger,
-            begin the countdown if it hasn't
-            already started.
-        */
+        setTimeout(
+            function () {
 
-        setTimeout(() => {
+                if (!returned) {
 
-            if (!returned) {
+                    returned = true;
 
-                returned = true;
 
-                document.removeEventListener(
-                    "visibilitychange",
-                    checkReturn
-                );
+                    document.removeEventListener(
+                        "visibilitychange",
+                        checkReturn
+                    );
 
-                startCountdown();
 
-            }
+                    console.log(
+                        "Ad return fallback triggered."
+                    );
 
-        }, 8000);
+
+                    startCountdown();
+
+                }
+
+            },
+            8000
+        );
 
     }
 
 
-    /* =========================
-       COUNTDOWN
-    ========================= */
+/* ==========================================
+   5 SECOND COUNTDOWN
+========================================== */
 
-    function startCountdown() {
+function startCountdown() {
 
-        if (
-            countdownStarted ||
-            countdownFinished
-        ) {
+    if (
+        countdownStarted ||
+        countdownFinished
+    ) {
+        return;
+    }
 
-            return;
-        }
+    countdownStarted = true;
 
+    const countdown =
+        document.getElementById(
+            "countdown"
+        );
 
-        countdownStarted = true;
+    const downloadButton =
+        document.getElementById(
+            "downloadButton"
+        );
 
+    if (
+        !countdown ||
+        !downloadButton
+    ) {
+        return;
+    }
 
-        const countdown =
-            document.getElementById(
-                "countdown"
-            );
+    let seconds = 5;
 
+    countdown.innerHTML = `
+        <div class="countdown-number">
+            ${seconds}
+        </div>
 
-        const downloadButton =
-            document.getElementById(
-                "downloadButton"
-            );
+        Preparing your download...
+    `;
 
-
-        if (
-            !countdown ||
-            !downloadButton
-        ) {
-
-            return;
-        }
-
-
-        let seconds = 5;
-
-
-        countdown.innerHTML = `
-
-            <div class="countdown-number">
-                ${seconds}
-            </div>
-
-            Preparing your download...
-
-        `;
-
-
-        countdownTimer =
-            setInterval(() => {
+    countdownTimer =
+        setInterval(
+            function () {
 
                 seconds--;
 
-
-                if (
-                    seconds > 0
-                ) {
+                if (seconds > 0) {
 
                     countdown.innerHTML = `
-
-                        <div
-                            class="countdown-number"
-                        >
+                        <div class="countdown-number">
                             ${seconds}
                         </div>
 
-                        Preparing your
-                        download...
-
+                        Preparing your download...
                     `;
 
                 } else {
@@ -869,191 +922,166 @@
                         countdownTimer
                     );
 
-
                     countdownFinished = true;
-
 
                     countdown.style.display =
                         "none";
-
 
                     downloadButton.classList.add(
                         "visible"
                     );
 
+                    console.log(
+                        "Download button enabled."
+                    );
                 }
 
-            }, 1000);
+            },
+            1000
+        );
+}
+
+
+/* ==========================================
+   FILE SIZE
+========================================== */
+
+function formatFileSize(bytes) {
+
+    if (
+        bytes === null ||
+        bytes === undefined ||
+        bytes === "" ||
+        isNaN(bytes)
+    ) {
+        return "Unknown";
+    }
+
+    bytes = Number(bytes);
+
+    if (
+        bytes >=
+        1024 * 1024 * 1024
+    ) {
+
+        return (
+            bytes /
+            (1024 * 1024 * 1024)
+        ).toFixed(2) + " GB";
 
     }
 
-
-    /* =========================
-       FILE SIZE
-    ========================= */
-
-    function formatFileSize(
-        bytes
+    if (
+        bytes >=
+        1024 * 1024
     ) {
 
-        if (
-            bytes === null ||
-            bytes === undefined ||
-            bytes === "" ||
-            isNaN(bytes)
-        ) {
+        return (
+            bytes /
+            (1024 * 1024)
+        ).toFixed(2) + " MB";
 
-            return "Unknown";
+    }
 
-        }
+    if (
+        bytes >=
+        1024
+    ) {
 
-
-        bytes =
-            Number(bytes);
-
-
-        if (
-            bytes >=
-            1024 * 1024 * 1024
-        ) {
-
-            return (
-                bytes /
-                (1024 * 1024 * 1024)
-            ).toFixed(2) +
-            " GB";
-
-        }
-
-
-        if (
-            bytes >=
-            1024 * 1024
-        ) {
-
-            return (
-                bytes /
-                (1024 * 1024)
-            ).toFixed(2) +
-            " MB";
-
-        }
-
-
-        if (
-            bytes >=
+        return (
+            bytes /
             1024
+        ).toFixed(2) + " KB";
+
+    }
+
+    return bytes + " B";
+}
+
+
+/* ==========================================
+   DETECT QUALITY
+========================================== */
+
+function getQuality(
+    fileName,
+    caption
+) {
+
+    const text =
+        (
+            (fileName || "") +
+            " " +
+            (caption || "")
+        ).toLowerCase();
+
+    const qualities = [
+        "2160p",
+        "4k",
+        "1080p",
+        "720p",
+        "480p",
+        "360p"
+    ];
+
+    for (
+        const quality
+        of qualities
+    ) {
+
+        if (
+            text.includes(
+                quality
+            )
         ) {
 
-            return (
-                bytes /
-                1024
-            ).toFixed(2) +
-            " KB";
+            return quality;
 
         }
 
-
-        return bytes + " B";
-
     }
 
-
-    /* =========================
-       QUALITY
-    ========================= */
-
-    function getQuality(
-        fileName,
-        caption
-    ) {
-
-        const text =
-            (
-                (fileName || "") +
-                " " +
-                (caption || "")
-            ).toLowerCase();
+    return "";
+}
 
 
-        const qualities = [
-            "2160p",
-            "4k",
-            "1080p",
-            "720p",
-            "480p",
-            "360p"
-        ];
+/* ==========================================
+   HTML ESCAPE
+========================================== */
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
 
 
-        for (
-            const quality
-            of qualities
-        ) {
+/* ==========================================
+   START APP
+========================================== */
 
-            if (
-                text.includes(
-                    quality
-                )
-            ) {
-
-                return quality;
-
-            }
-
-        }
-
-
-        return "";
-
-    }
-
-
-    /* =========================
-       SECURITY
-    ========================= */
-
-    function escapeHTML(
-        value
-    ) {
-
-        return String(value)
-
-            .replace(
-                /&/g,
-                "&amp;"
-            )
-
-            .replace(
-                /</g,
-                "&lt;"
-            )
-
-            .replace(
-                />/g,
-                "&gt;"
-            )
-
-            .replace(
-                /"/g,
-                "&quot;"
-            )
-
-            .replace(
-                /'/g,
-                "&#039;"
-            );
-
-    }
-
-
-    /* =========================
-       START
-    ========================= */
-
-    loadVideo();
-
-</script>
-
-</body>
-</html>
+loadVideo();
