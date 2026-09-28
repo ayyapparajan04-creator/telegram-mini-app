@@ -2,14 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
 
     <title>Video Download</title>
 
-    <!-- Telegram Mini App SDK -->
+    <!-- Telegram Mini App -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <!-- Monetag SDK -->
+    <!-- Monetag -->
     <script
         src="//libtl.com/sdk.js"
         data-zone="11903209"
@@ -23,59 +27,72 @@
 
         body {
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            background: #111827;
+            color: #ffffff;
             font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            color: #222;
         }
 
         .container {
-            max-width: 600px;
-            margin: auto;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
         .card {
-            background: white;
+            background: #1f2937;
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
-        h1 {
-            margin-top: 0;
+        .title {
             font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
             text-align: center;
         }
 
         .movie-title {
             font-size: 20px;
             font-weight: bold;
-            margin-bottom: 15px;
+            line-height: 1.4;
+            margin-bottom: 18px;
             text-align: center;
         }
 
         .info {
-            margin-top: 10px;
-            line-height: 1.7;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
         }
 
-        .info strong {
-            display: inline-block;
-            min-width: 90px;
+        .info-item {
+            background: #374151;
+            border-radius: 10px;
+            padding: 12px;
         }
 
-        .status {
-            margin-top: 20px;
-            text-align: center;
+        .label {
+            color: #9ca3af;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .value {
+            color: #ffffff;
             font-size: 15px;
-            color: #666;
+            font-weight: 600;
+            word-break: break-word;
         }
 
         .countdown {
-            margin-top: 20px;
             text-align: center;
-            font-size: 18px;
-            font-weight: bold;
+            margin-top: 25px;
+            font-size: 15px;
+            color: #d1d5db;
+            min-height: 22px;
         }
 
         #downloadBtn {
@@ -84,9 +101,9 @@
             margin-top: 20px;
             padding: 15px;
             border: none;
-            border-radius: 10px;
-            background: #2196f3;
-            color: white;
+            border-radius: 12px;
+            background: #22c55e;
+            color: #ffffff;
             font-size: 17px;
             font-weight: bold;
             cursor: pointer;
@@ -97,9 +114,23 @@
         }
 
         .error {
-            color: #d32f2f;
-            text-align: center;
+            display: none;
             margin-top: 20px;
+            padding: 14px;
+            background: #7f1d1d;
+            border-radius: 10px;
+            color: #fecaca;
+            text-align: center;
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                padding: 14px;
+            }
+
+            .info {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -107,71 +138,138 @@
 <body>
 
 <div class="container">
+
     <div class="card">
 
-        <h1>Video Download</h1>
-
-        <div id="movieTitle" class="movie-title">
-            Loading video...
+        <div class="title">
+            Video Download
         </div>
 
-        <div id="videoInfo" class="info"></div>
-
-        <div id="status" class="status">
+        <div
+            id="movieTitle"
+            class="movie-title">
             Loading...
         </div>
 
-        <div id="countdown" class="countdown"></div>
+        <div class="info">
 
-        <button id="downloadBtn" type="button">
+            <div class="info-item">
+                <div class="label">Size</div>
+                <div
+                    id="fileSize"
+                    class="value">
+                    -
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="label">Language</div>
+                <div
+                    id="language"
+                    class="value">
+                    -
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="label">Quality</div>
+                <div
+                    id="quality"
+                    class="value">
+                    -
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="label">Year</div>
+                <div
+                    id="year"
+                    class="value">
+                    -
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="label">Genre</div>
+                <div
+                    id="genre"
+                    class="value">
+                    -
+                </div>
+            </div>
+
+        </div>
+
+        <div
+            id="countdown"
+            class="countdown">
+        </div>
+
+        <button
+            id="downloadBtn"
+            type="button">
             Download
         </button>
 
-        <div id="errorMessage" class="error"></div>
+        <div
+            id="errorMessage"
+            class="error">
+        </div>
 
     </div>
-</div>
-    
-<script>
-    // ==============================
-    // TELEGRAM MINI APP
-    // ==============================
 
-    if (window.Telegram && window.Telegram.WebApp) {
+</div>
+
+
+<script>
+
+    /* =========================================
+       CONFIGURATION
+    ========================================= */
+
+    const MAKE_WEBHOOK =
+        "https://hook.eu1.make.com/ud3xahsh42yybn9byb7pu8i7bzv7i4ra";
+
+    const BOT_USERNAME =
+        "Aa_ishh_bot";
+
+
+    /* =========================================
+       TELEGRAM
+    ========================================= */
+
+    if (
+        window.Telegram &&
+        window.Telegram.WebApp
+    ) {
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
     }
 
 
-    // ==============================
-    // MAKE.COM WEBHOOK
-    // ==============================
-
-    const MAKE_WEBHOOK =
-        "https://hook.eu1.make.com/ud3xahsh42yybn9byb7pu8i7bzv7i4ra";
-
-
-    // ==============================
-    // BOT
-    // ==============================
-
-    const BOT_USERNAME = "Aa_ishh_bot";
-
-
-    // ==============================
-    // GET ELEMENTS
-    // ==============================
+    /* =========================================
+       ELEMENTS
+    ========================================= */
 
     const movieTitle =
         document.getElementById("movieTitle");
 
-    const videoInfo =
-        document.getElementById("videoInfo");
+    const fileSize =
+        document.getElementById("fileSize");
 
-    const statusText =
-        document.getElementById("status");
+    const language =
+        document.getElementById("language");
 
-    const countdownText =
+    const quality =
+        document.getElementById("quality");
+
+    const year =
+        document.getElementById("year");
+
+    const genre =
+        document.getElementById("genre");
+
+    const countdown =
         document.getElementById("countdown");
 
     const downloadBtn =
@@ -181,434 +279,275 @@
         document.getElementById("errorMessage");
 
 
-    // ==============================
-    // GET SHORT CODE FROM URL
-    // ==============================
+    /* =========================================
+       GET SHORT CODE
+    ========================================= */
 
-    const urlParams =
-        new URLSearchParams(window.location.search);
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
 
     const shortCode =
-        urlParams.get("code");
+        params.get("code");
+
+    let actualCode =
+        shortCode;
 
 
-    // This will hold the actual code returned by Make/Neon
-    let actualCode = shortCode;
+    /* =========================================
+       HELPER
+    ========================================= */
 
+    function cleanValue(value) {
 
-    // ==============================
-    // BASIC VALIDATION
-    // ==============================
-
-    if (!shortCode) {
-
-        movieTitle.textContent =
-            "Video not found";
-
-        statusText.textContent =
-            "";
-
-        errorMessage.textContent =
-            "No video code was provided.";
-
-    }
-
-
-    // ==============================
-    // HTML ESCAPE
-    // ==============================
-
-    function escapeHtml(value) {
-
-        if (value === null || value === undefined) {
+        if (
+            value === undefined ||
+            value === null
+        ) {
             return "";
         }
 
-        return String(value)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+        if (
+            typeof value === "string"
+        ) {
+
+            const cleaned =
+                value.trim();
+
+            if (
+                cleaned === "" ||
+                cleaned.toLowerCase() === "null" ||
+                cleaned.toLowerCase() === "undefined"
+            ) {
+                return "";
+            }
+
+            return cleaned;
+        }
+
+        return String(value);
     }
 
 
-    // ==============================
-    // FORMAT FILE SIZE
-    // ==============================
-
-    function formatFileSize(size) {
+    function getField(obj, names) {
 
         if (
-            size === null ||
-            size === undefined ||
-            size === ""
+            !obj ||
+            typeof obj !== "object"
         ) {
-            return "Unknown";
+            return "";
         }
 
-        const number =
-            Number(size);
+        for (const name of names) {
 
-        if (isNaN(number)) {
-            return escapeHtml(size);
+            if (
+                obj[name] !== undefined &&
+                obj[name] !== null &&
+                cleanValue(obj[name]) !== ""
+            ) {
+
+                return cleanValue(
+                    obj[name]
+                );
+            }
         }
 
-        if (number < 1024) {
-            return number + " B";
+
+        const keys =
+            Object.keys(obj);
+
+
+        for (const wanted of names) {
+
+            const found =
+                keys.find(
+                    key =>
+                        key.toLowerCase() ===
+                        wanted.toLowerCase()
+                );
+
+            if (found) {
+
+                const value =
+                    cleanValue(
+                        obj[found]
+                    );
+
+                if (value !== "") {
+                    return value;
+                }
+            }
         }
 
-        if (number < 1024 * 1024) {
-            return (
-                (number / 1024).toFixed(1) +
-                " KB"
-            );
-        }
-
-        if (number < 1024 * 1024 * 1024) {
-            return (
-                (number / (1024 * 1024)).toFixed(2) +
-                " MB"
-            );
-        }
-
-        return (
-            (number / (1024 * 1024 * 1024)).toFixed(2) +
-            " GB"
-        );
+        return "";
     }
 
 
-    // ==============================
-    // QUALITY DETECTION
-    // ==============================
-
-    function detectQuality(video) {
-
-        const text = (
-            (video.file_name || "") +
-            " " +
-            (video.caption || "") +
-            " " +
-            (video.quality || "")
-        ).toLowerCase();
-
-        if (text.includes("2160") || text.includes("4k")) {
-            return "4K";
-        }
-
-        if (text.includes("1440")) {
-            return "1440p";
-        }
-
-        if (
-            text.includes("1080") ||
-            text.includes("fhd")
-        ) {
-            return "1080p";
-        }
-
-        if (text.includes("720") ||
-            text.includes("hd")) {
-            return "720p";
-        }
-
-        if (text.includes("480")) {
-            return "480p";
-        }
-
-        if (video.quality) {
-            return video.quality;
-        }
-
-        return "Unknown";
-    }
-
-    // ==============================
-    // DISPLAY VIDEO
-    // ==============================
+    /* =========================================
+       DISPLAY VIDEO
+    ========================================= */
 
     function displayVideo(video) {
 
         if (!video) {
 
-            throw new Error(
-                "Video data was not found."
+            showError(
+                "Video not found."
             );
 
+            return;
         }
 
-        actualCode =
-            video.short_code ||
-            shortCode;
 
-
-        const title =
-            video.movie_name ||
-            video.file_name ||
-            "Video";
-
-
-        const year =
-            video.year ||
-            "";
-
-
-        const language =
-            video.language ||
-            "Unknown";
-
-
-        const genre =
-            video.genre ||
-            "Unknown";
-
-
-        const fileSize =
-            formatFileSize(
-                video.file_size
-            );
-
-
-        const quality =
-            detectQuality(video);
-
+        const movie =
+            getField(video, [
+                "movie_name",
+                "movieName",
+                "movie",
+                "title",
+                "file_name",
+                "fileName"
+            ]);
 
         movieTitle.textContent =
-            title +
-            (year ? " (" + year + ")" : "");
+            movie || "Video Download";
 
 
-        videoInfo.innerHTML = `
-            <div>
-                <strong>Language:</strong>
-                ${escapeHtml(language)}
-            </div>
+        const size =
+            getField(video, [
+                "file_size",
+                "fileSize",
+                "size"
+            ]);
 
-            <div>
-                <strong>Genre:</strong>
-                ${escapeHtml(genre)}
-            </div>
+        fileSize.textContent =
+            size || "-";
 
-            <div>
-                <strong>Quality:</strong>
-                ${escapeHtml(quality)}
-            </div>
 
-            <div>
-                <strong>Size:</strong>
-                ${escapeHtml(fileSize)}
-            </div>
-        `;
+        const lang =
+            getField(video, [
+                "language",
+                "lang",
+                "movie_language",
+                "audio_language",
+                "audioLanguage"
+            ]);
 
-        statusText.textContent =
-            "Preparing download...";
+        language.textContent =
+            lang || "-";
 
+
+        let videoQuality =
+            getField(video, [
+                "quality",
+                "video_quality",
+                "videoQuality",
+                "resolution"
+            ]);
+
+
+        if (!videoQuality) {
+
+            const caption =
+                getField(video, [
+                    "caption"
+                ]);
+
+            if (caption) {
+
+                const qualityMatch =
+                    caption.match(
+                        /\b(4K|2160p|1440p|1080p|720p|480p|360p|HD|FHD|WEB-DL|WEBRip|BluRay)\b/i
+                    );
+
+                if (qualityMatch) {
+
+                    videoQuality =
+                        qualityMatch[1];
+                }
+            }
+        }
+
+
+        quality.textContent =
+            videoQuality || "-";
+
+
+        const videoYear =
+            getField(video, [
+                "year",
+                "release_year",
+                "releaseYear"
+            ]);
+
+        year.textContent =
+            videoYear || "-";
+
+
+        const videoGenre =
+            getField(video, [
+                "genre",
+                "genres"
+            ]);
+
+        genre.textContent =
+            videoGenre || "-";
+
+
+        const returnedCode =
+            getField(video, [
+                "short_code",
+                "shortCode",
+                "code"
+            ]);
+
+        if (returnedCode) {
+            actualCode =
+                returnedCode;
+        }
     }
 
 
-    // ==============================
-    // WAIT FOR USER TO RETURN
-    // AFTER MONETAG AD
-    // ==============================
+    /* =========================================
+       ERROR
+    ========================================= */
 
-    function waitForReturnFromAd() {
+    function showError(message) {
 
-        return new Promise(function(resolve) {
+        errorMessage.textContent =
+            message;
 
-            let finished = false;
+        errorMessage.style.display =
+            "block";
 
-            function finish() {
+        movieTitle.textContent =
+            "Video Download";
 
-                if (finished) {
-                    return;
-                }
-
-                finished = true;
-
-                document.removeEventListener(
-                    "visibilitychange",
-                    visibilityHandler
-                );
-
-                resolve();
-
-            }
-
-
-            function visibilityHandler() {
-
-                if (
-                    document.visibilityState ===
-                    "visible"
-                ) {
-                    finish();
-                }
-
-            }
-
-
-            document.addEventListener(
-                "visibilitychange",
-                visibilityHandler
-            );
-
-
-            // Fallback in case the ad does not
-            // trigger a visibility change.
-            setTimeout(function() {
-                finish();
-            }, 8000);
-
-        });
-
-    }
-
-
-    // ==============================
-    // COUNTDOWN
-    // ==============================
-
-    function startCountdown() {
-
-        let seconds = 5;
+        countdown.textContent =
+            "";
 
         downloadBtn.style.display =
             "none";
-
-        countdownText.textContent =
-            "Download available in " +
-            seconds +
-            " seconds";
-
-
-        const timer =
-            setInterval(function() {
-
-                seconds--;
-
-                if (seconds > 0) {
-
-                    countdownText.textContent =
-                        "Download available in " +
-                        seconds +
-                        " seconds";
-
-                    return;
-                }
-
-
-                clearInterval(timer);
-
-
-                countdownText.textContent =
-                    "Download is ready";
-
-
-                statusText.textContent =
-                    "";
-
-
-                downloadBtn.style.display =
-                    "block";
-
-            }, 1000);
-
     }
 
-
-    // ==============================
-    // SHOW MONETAG AD
-    // ==============================
-
-    async function showAdAndStartCountdown() {
-
-        statusText.textContent =
-            "Preparing advertisement...";
-
-
-        // Wait 3 seconds before showing ad
-        await new Promise(function(resolve) {
-
-            setTimeout(
-                resolve,
-                3000
-            );
-
-        });
-
-
-        try {
-
-            if (
-                typeof show_11903209 ===
-                "function"
-            ) {
-
-                show_11903209({
-
-                    type: "inApp",
-
-                    inAppSettings: {
-
-                        frequency: 2,
-
-                        capping: 0.1,
-
-                        interval: 30,
-
-                        timeout: 5,
-
-                        everyPage: false
-
-                    }
-
-                });
-
-            }
-
-        } catch (error) {
-
-            console.log(
-                "Monetag error:",
-                error
-            );
-
-        }
-
-
-        statusText.textContent =
-            "Please return to the app after the advertisement.";
-
-
-        await waitForReturnFromAd();
-
-
-        statusText.textContent =
-            "Almost ready...";
-
-
-        startCountdown();
-
-    }
-
-
-    // ==============================
-    // LOAD VIDEO FROM MAKE
-    // ==============================
+    /* =========================================
+       LOAD VIDEO FROM MAKE
+    ========================================= */
 
     async function loadVideo() {
 
         if (!shortCode) {
+
+            showError(
+                "No video code was provided."
+            );
+
             return;
         }
 
 
         try {
-
-            statusText.textContent =
-                "Loading video...";
-
 
             const response =
                 await fetch(
@@ -632,10 +571,8 @@
             if (!response.ok) {
 
                 throw new Error(
-                    "Server returned HTTP " +
-                    response.status
+                    "Request failed"
                 );
-
             }
 
 
@@ -643,55 +580,28 @@
                 await response.text();
 
 
-            if (!text) {
-
-                throw new Error(
-                    "Make returned an empty response."
-                );
-
-            }
-
-
             let data;
-
 
             try {
 
                 data =
                     JSON.parse(text);
 
-            } catch (jsonError) {
-
-                console.log(
-                    "Raw Make response:",
-                    text
-                );
+            } catch (e) {
 
                 throw new Error(
-                    "Make returned invalid JSON."
+                    "Invalid response"
                 );
-
             }
 
-
-            console.log(
-                "Make response:",
-                data
-            );
-
-
-            // Support either:
-            // { success:true, video:{...} }
-            //
-            // or:
-            // { videos:[{...}] }
 
             let video = null;
 
 
             if (
                 data &&
-                data.video
+                data.video &&
+                typeof data.video === "object"
             ) {
 
                 video =
@@ -707,82 +617,252 @@
                     data.videos[0];
 
             } else if (
-                Array.isArray(data) &&
-                data.length > 0
+                data &&
+                Array.isArray(data.data) &&
+                data.data.length > 0
             ) {
 
                 video =
-                    data[0];
+                    data.data[0];
 
+            } else if (
+                data &&
+                typeof data === "object" &&
+                (
+                    data.movie_name ||
+                    data.movieName ||
+                    data.file_name ||
+                    data.short_code ||
+                    data.shortCode ||
+                    data.language ||
+                    data.file_size
+                )
+            ) {
+
+                video =
+                    data;
             }
 
 
             if (!video) {
 
-                throw new Error(
-                    "No video was returned for this short code."
+                showError(
+                    "Video not found."
                 );
 
+                return;
             }
 
 
             displayVideo(video);
 
 
-            // Start advertisement process
-            await showAdAndStartCountdown();
+            startAdProcess();
 
 
         } catch (error) {
 
-            console.error(
-                "Load video error:",
-                error
+            showError(
+                "Unable to load the video."
+            );
+        }
+    }
+
+
+    /* =========================================
+       MONETAG
+    ========================================= */
+
+    function startAdProcess() {
+
+        setTimeout(() => {
+
+            try {
+
+                if (
+                    typeof show_11903209 ===
+                    "function"
+                ) {
+
+                    show_11903209({
+
+                        type: "inApp",
+
+                        inAppSettings: {
+
+                            frequency: 2,
+
+                            capping: 0.1,
+
+                            interval: 30,
+
+                            timeout: 5,
+
+                            everyPage: false
+                        }
+
+                    });
+                }
+
+            } catch (error) {
+                // Continue normally if ad fails
+            }
+
+
+            waitForReturn();
+
+        }, 3000);
+    }
+
+
+    /* =========================================
+       WAIT FOR RETURN
+    ========================================= */
+
+    function waitForReturn() {
+
+        let countdownStarted =
+            false;
+
+        let fallbackTimer;
+
+
+        function startCountdownOnce() {
+
+            if (countdownStarted) {
+                return;
+            }
+
+            countdownStarted =
+                true;
+
+            clearTimeout(
+                fallbackTimer
             );
 
+            document.removeEventListener(
+                "visibilitychange",
+                visibilityHandler
+            );
 
-            movieTitle.textContent =
-                "Unable to load video";
-
-
-            statusText.textContent =
-                "";
-
-
-            errorMessage.textContent =
-                error.message ||
-                "Something went wrong.";
-
+            startCountdown();
         }
 
+
+        function visibilityHandler() {
+
+            if (
+                document.visibilityState ===
+                "visible"
+            ) {
+
+                startCountdownOnce();
+            }
+        }
+
+
+        document.addEventListener(
+            "visibilitychange",
+            visibilityHandler
+        );
+
+
+        fallbackTimer =
+            setTimeout(
+                startCountdownOnce,
+                8000
+            );
     }
 
-    // ==============================
-    // DOWNLOAD BUTTON
-    // ==============================
+
+    /* =========================================
+       COUNTDOWN
+    ========================================= */
+
+    function startCountdown() {
+
+        let remaining = 5;
+
+
+        countdown.textContent =
+            "Download available in " +
+            remaining +
+            " seconds";
+
+
+        const timer =
+            setInterval(() => {
+
+                remaining--;
+
+
+                if (remaining > 0) {
+
+                    countdown.textContent =
+                        "Download available in " +
+                        remaining +
+                        " seconds";
+
+                } else {
+
+                    clearInterval(timer);
+
+                    countdown.textContent =
+                        "";
+
+                    downloadBtn.style.display =
+                        "block";
+                }
+
+            }, 1000);
+    }
+
+
+    /* =========================================
+       DOWNLOAD
+    ========================================= */
 
     downloadBtn.addEventListener(
-    "click",
-    function () {
+        "click",
+        function () {
 
-        alert("DOWNLOAD BUTTON CLICKED");
-
-        const botLink =
-            "https://t.me/" +
-            BOT_USERNAME +
-            "?start=" +
-            encodeURIComponent(actualCode);
-
-        alert(botLink);
-
-        window.Telegram.WebApp.openTelegramLink(botLink);
-    }
-);
+            if (!actualCode) {
+                return;
+            }
 
 
-    // ==============================
-    // START
-    // ==============================
+            const botLink =
+                "https://t.me/" +
+                BOT_USERNAME +
+                "?start=" +
+                encodeURIComponent(
+                    actualCode
+                );
+
+
+            if (
+                window.Telegram &&
+                window.Telegram.WebApp &&
+                typeof window.Telegram.WebApp.openTelegramLink ===
+                "function"
+            ) {
+
+                window.Telegram.WebApp.openTelegramLink(
+                    botLink
+                );
+
+            } else {
+
+                window.location.href =
+                    botLink;
+            }
+        }
+    );
+
+
+    /* =========================================
+       START
+    ========================================= */
 
     loadVideo();
 
