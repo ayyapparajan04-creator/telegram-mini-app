@@ -647,48 +647,12 @@
                 );
 
 
-            downloadButton.addEventListener(
-                "click",
-                function () {
-
-                    console.log(
-                        "Download clicked"
-                    );
-
-
-                    /*
-                     * Telegram Mini App
-                     * native link opening
-                     */
-
-                    if (
-                        window.Telegram &&
-                        window.Telegram.WebApp &&
-                        typeof
-                        window.Telegram.WebApp
-                            .openTelegramLink ===
-                            "function"
-                    ) {
-
-                        window.Telegram.WebApp
-                            .openTelegramLink(
-                                botLink
-                            );
-
-                    } else {
-
-                        /*
-                         * Browser fallback
-                         */
-
-                        window.location.href =
-                            botLink;
-
-                    }
-
-                }
-            );
-
+            downloadBtn.addEventListener("click", function () {
+                const botLink =
+                    "https://t.me/Aa_ishh_bot?start=" +
+                    encodeURIComponent(actualCode);
+                window.open(botLink, "_blank");
+            });
 
             /*
              * Start Monetag after
