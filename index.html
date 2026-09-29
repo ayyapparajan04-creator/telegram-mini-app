@@ -10,14 +10,28 @@
 
     <title>Video Download</title>
 
-    <!-- Telegram Mini App -->
+    <!-- Telegram WebApp -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <!-- Monetag -->
+    <!-- MONETAG SDK -->
     <script
         src="//libtl.com/sdk.js"
         data-zone="11903209"
         data-sdk="show_11903209">
+    </script>
+
+    <!-- MONETAG IN-APP INTERSTITIAL -->
+    <script>
+        show_11903209({
+            type: 'inApp',
+            inAppSettings: {
+                frequency: 2,
+                capping: 0.1,
+                interval: 30,
+                timeout: 5,
+                everyPage: false
+            }
+        });
     </script>
 
     <style>
@@ -47,18 +61,19 @@
         }
 
         .title {
+            text-align: center;
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 20px;
-            text-align: center;
         }
 
         .movie-title {
+            text-align: center;
             font-size: 20px;
             font-weight: bold;
             line-height: 1.4;
             margin-bottom: 18px;
-            text-align: center;
+            word-break: break-word;
         }
 
         .info {
@@ -90,9 +105,9 @@
         .countdown {
             text-align: center;
             margin-top: 25px;
+            min-height: 22px;
             font-size: 15px;
             color: #d1d5db;
-            min-height: 22px;
         }
 
         #downloadBtn {
@@ -138,16 +153,13 @@
 <body>
 
 <div class="container">
-
     <div class="card">
 
         <div class="title">
             Video Download
         </div>
 
-        <div
-            id="movieTitle"
-            class="movie-title">
+        <div id="movieTitle" class="movie-title">
             Loading...
         </div>
 
@@ -155,165 +167,128 @@
 
             <div class="info-item">
                 <div class="label">Size</div>
-                <div
-                    id="fileSize"
-                    class="value">
-                    -
-                </div>
+                <div id="fileSize" class="value">-</div>
             </div>
 
             <div class="info-item">
                 <div class="label">Language</div>
-                <div
-                    id="language"
-                    class="value">
-                    -
-                </div>
+                <div id="language" class="value">-</div>
             </div>
 
             <div class="info-item">
                 <div class="label">Quality</div>
-                <div
-                    id="quality"
-                    class="value">
-                    -
-                </div>
+                <div id="quality" class="value">-</div>
             </div>
 
             <div class="info-item">
                 <div class="label">Year</div>
-                <div
-                    id="year"
-                    class="value">
-                    -
-                </div>
+                <div id="year" class="value">-</div>
             </div>
 
             <div class="info-item">
                 <div class="label">Genre</div>
-                <div
-                    id="genre"
-                    class="value">
-                    -
-                </div>
+                <div id="genre" class="value">-</div>
             </div>
 
         </div>
 
-        <div
-            id="countdown"
-            class="countdown">
-        </div>
+        <div id="countdown" class="countdown"></div>
 
-        <button
-            id="downloadBtn"
-            type="button">
+        <button id="downloadBtn" type="button">
             Download
         </button>
 
-        <div
-            id="errorMessage"
-            class="error">
-        </div>
+        <div id="errorMessage" class="error"></div>
 
     </div>
-
 </div>
 
-
 <script>
-
-    /* =========================================
-       CONFIGURATION
-    ========================================= */
-
     const MAKE_WEBHOOK =
         "https://hook.eu1.make.com/ud3xahsh42yybn9byb7pu8i7bzv7i4ra";
 
-    const BOT_USERNAME =
-        "Aa_ishh_bot";
+    const BOT_USERNAME = "Aa_ishh_bot";
 
 
-    /* =========================================
-       TELEGRAM
-    ========================================= */
-
-    if (
-        window.Telegram &&
-        window.Telegram.WebApp
-    ) {
+    /* Telegram */
+    if (window.Telegram && window.Telegram.WebApp) {
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
     }
 
 
-    /* =========================================
-       ELEMENTS
-    ========================================= */
-
-    const movieTitle =
-        document.getElementById("movieTitle");
-
-    const fileSize =
-        document.getElementById("fileSize");
-
-    const language =
-        document.getElementById("language");
-
-    const quality =
-        document.getElementById("quality");
-
-    const year =
-        document.getElementById("year");
-
-    const genre =
-        document.getElementById("genre");
-
-    const countdown =
-        document.getElementById("countdown");
-
-    const downloadBtn =
-        document.getElementById("downloadBtn");
-
-    const errorMessage =
-        document.getElementById("errorMessage");
+    /* Elements */
+    const movieTitle = document.getElementById("movieTitle");
+    const fileSize = document.getElementById("fileSize");
+    const language = document.getElementById("language");
+    const quality = document.getElementById("quality");
+    const year = document.getElementById("year");
+    const genre = document.getElementById("genre");
+    const countdown = document.getElementById("countdown");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const errorMessage = document.getElementById("errorMessage");
 
 
-    /* =========================================
-       GET SHORT CODE
-    ========================================= */
+    /* URL code */
+    const params = new URLSearchParams(window.location.search);
 
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
+    const shortCode = params.get("code");
 
-    const shortCode =
-        params.get("code");
-
-    let actualCode =
-        shortCode;
+    let actualCode = shortCode;
 
 
-    /* =========================================
-       HELPER
-    ========================================= */
+    /*
+     * Start the 5-second download countdown
+     * immediately when the page opens.
+     *
+     * IMPORTANT:
+     * This timer has NOTHING to do with Monetag.
+     */
+    function startDownloadTimer() {
 
+        let seconds = 5;
+
+        countdown.textContent =
+            "Download available in " + seconds + " seconds";
+
+        const timer = setInterval(function () {
+
+            seconds--;
+
+            if (seconds > 0) {
+
+                countdown.textContent =
+                    "Download available in " + seconds + " seconds";
+
+            } else {
+
+                clearInterval(timer);
+
+                countdown.textContent = "";
+
+                downloadBtn.style.display = "block";
+            }
+
+        }, 1000);
+    }
+
+
+    /*
+     * Start countdown immediately on page entry.
+     */
+    startDownloadTimer();
+
+
+    /* Clean values */
     function cleanValue(value) {
 
-        if (
-            value === undefined ||
-            value === null
-        ) {
+        if (value === undefined || value === null) {
             return "";
         }
 
-        if (
-            typeof value === "string"
-        ) {
+        if (typeof value === "string") {
 
-            const cleaned =
-                value.trim();
+            const cleaned = value.trim();
 
             if (
                 cleaned === "" ||
@@ -330,49 +305,47 @@
     }
 
 
-    function getField(obj, names) {
+    /* Get field from Make response */
+    function getField(object, fields) {
 
-        if (
-            !obj ||
-            typeof obj !== "object"
-        ) {
+        if (!object || typeof object !== "object") {
             return "";
         }
 
-        for (const name of names) {
+        for (const field of fields) {
 
             if (
-                obj[name] !== undefined &&
-                obj[name] !== null &&
-                cleanValue(obj[name]) !== ""
+                Object.prototype.hasOwnProperty.call(
+                    object,
+                    field
+                )
             ) {
 
-                return cleanValue(
-                    obj[name]
-                );
+                const value = cleanValue(object[field]);
+
+                if (value !== "") {
+                    return value;
+                }
             }
         }
 
 
-        const keys =
-            Object.keys(obj);
+        /* Case-insensitive fallback */
 
+        const keys = Object.keys(object);
 
-        for (const wanted of names) {
+        for (const wanted of fields) {
 
-            const found =
-                keys.find(
-                    key =>
-                        key.toLowerCase() ===
-                        wanted.toLowerCase()
-                );
+            const found = keys.find(
+                key =>
+                    key.toLowerCase() ===
+                    wanted.toLowerCase()
+            );
 
             if (found) {
 
                 const value =
-                    cleanValue(
-                        obj[found]
-                    );
+                    cleanValue(object[found]);
 
                 if (value !== "") {
                     return value;
@@ -384,87 +357,191 @@
     }
 
 
-    /* =========================================
-       DISPLAY VIDEO
-    ========================================= */
+    /*
+     * Format file size if Make/Neon returns
+     * the value as bytes.
+     *
+     * If the value already contains MB/GB/etc.,
+     * it is preserved.
+     */
+    function formatFileSize(value) {
 
+        if (
+            value === undefined ||
+            value === null ||
+            value === ""
+        ) {
+            return "-";
+        }
+
+
+        /* Object response fallback */
+        if (typeof value === "object") {
+
+            const possible =
+                value.value ??
+                value.formatted ??
+                value.size ??
+                value.file_size;
+
+            if (
+                possible !== undefined &&
+                possible !== null
+            ) {
+                value = possible;
+            } else {
+                return "-";
+            }
+        }
+
+
+        const text = String(value).trim();
+
+
+        /* Already formatted */
+        if (
+            /kb|mb|gb|tb|bytes?/i.test(text)
+        ) {
+            return text;
+        }
+
+
+        /* Numeric bytes */
+        const bytes = Number(
+            text.replace(/,/g, "")
+        );
+
+        if (
+            Number.isFinite(bytes) &&
+            bytes > 0
+        ) {
+
+            const units = [
+                "B",
+                "KB",
+                "MB",
+                "GB",
+                "TB"
+            ];
+
+            let size = bytes;
+            let index = 0;
+
+            while (
+                size >= 1024 &&
+                index < units.length - 1
+            ) {
+                size /= 1024;
+                index++;
+            }
+
+            return (
+                size.toFixed(index === 0 ? 0 : 2)
+                .replace(/\.00$/, "") +
+                " " +
+                units[index]
+            );
+        }
+
+
+        return text || "-";
+    }
+
+
+    /* Get file size */
+    function getFileSize(video) {
+
+        let size = getField(video, [
+            "file_size",
+            "fileSize",
+            "filesize",
+            "size",
+            "Size"
+        ]);
+
+
+        /* Check nested video object */
+        if (!size && video.video) {
+
+            size = getField(video.video, [
+                "file_size",
+                "fileSize",
+                "filesize",
+                "size"
+            ]);
+        }
+
+
+        return formatFileSize(size);
+    }
+
+
+    /* Display video */
     function displayVideo(video) {
 
         if (!video) {
 
-            showError(
-                "Video not found."
-            );
+            showError("Video not found.");
 
             return;
         }
 
 
-        const movie =
-            getField(video, [
-                "movie_name",
-                "movieName",
-                "movie",
-                "title",
-                "file_name",
-                "fileName"
-            ]);
+        /* Movie */
+        const title = getField(video, [
+            "movie_name",
+            "movieName",
+            "movie",
+            "title",
+            "file_name",
+            "fileName"
+        ]);
 
         movieTitle.textContent =
-            movie || "Video Download";
+            title || "Video Download";
 
 
-        const size =
-            getField(video, [
-                "file_size",
-                "fileSize",
-                "size"
-            ]);
-
+        /* Size */
         fileSize.textContent =
-            size || "-";
+            getFileSize(video);
 
 
-        const lang =
-            getField(video, [
-                "language",
-                "lang",
-                "movie_language",
-                "audio_language",
-                "audioLanguage"
-            ]);
+        /* Language */
+        const lang = getField(video, [
+            "language",
+            "lang",
+            "movie_language",
+            "audio_language",
+            "audioLanguage"
+        ]);
 
         language.textContent =
             lang || "-";
 
 
-        let videoQuality =
-            getField(video, [
-                "quality",
-                "video_quality",
-                "videoQuality",
-                "resolution"
-            ]);
+        /* Quality */
+        let videoQuality = getField(video, [
+            "quality",
+            "video_quality",
+            "videoQuality",
+            "resolution"
+        ]);
 
 
+        /* Quality fallback from caption */
         if (!videoQuality) {
 
             const caption =
-                getField(video, [
-                    "caption"
-                ]);
+                getField(video, ["caption"]);
 
             if (caption) {
 
-                const qualityMatch =
-                    caption.match(
-                        /\b(4K|2160p|1440p|1080p|720p|480p|360p|HD|FHD|WEB-DL|WEBRip|BluRay)\b/i
-                    );
+                const match = caption.match(
+                    /\b(4K|2160p|1440p|1080p|720p|480p|360p|HD|FHD|WEB-DL|WEBRip|BluRay)\b/i
+                );
 
-                if (qualityMatch) {
-
-                    videoQuality =
-                        qualityMatch[1];
+                if (match) {
+                    videoQuality = match[1];
                 }
             }
         }
@@ -474,67 +551,64 @@
             videoQuality || "-";
 
 
-        const videoYear =
-            getField(video, [
-                "year",
-                "release_year",
-                "releaseYear"
-            ]);
+        /* Year */
+        const videoYear = getField(video, [
+            "year",
+            "release_year",
+            "releaseYear"
+        ]);
 
         year.textContent =
             videoYear || "-";
 
 
-        const videoGenre =
-            getField(video, [
-                "genre",
-                "genres"
-            ]);
+        /* Genre */
+        const videoGenre = getField(video, [
+            "genre",
+            "genres"
+        ]);
 
         genre.textContent =
             videoGenre || "-";
 
 
-        const returnedCode =
-            getField(video, [
-                "short_code",
-                "shortCode",
-                "code"
-            ]);
+        /* Returned short code */
+        const returnedCode = getField(video, [
+            "short_code",
+            "shortCode",
+            "code"
+        ]);
 
         if (returnedCode) {
-            actualCode =
-                returnedCode;
+            actualCode = returnedCode;
         }
     }
 
 
-    /* =========================================
-       ERROR
-    ========================================= */
-
+    /* Error */
     function showError(message) {
 
-        errorMessage.textContent =
-            message;
+        errorMessage.textContent = message;
 
-        errorMessage.style.display =
-            "block";
+        errorMessage.style.display = "block";
 
         movieTitle.textContent =
             "Video Download";
 
-        countdown.textContent =
-            "";
-
-        downloadBtn.style.display =
-            "none";
+        downloadBtn.style.display = "none";
     }
 
-    /* =========================================
-       LOAD VIDEO FROM MAKE
-    ========================================= */
+<script>
 
+    /*
+     * Load video information from Make.com
+     *
+     * NOTE:
+     * The 5-second timer is NOT here.
+     * It already started when the page opened.
+     *
+     * Monetag is also completely independent.
+     */
     async function loadVideo() {
 
         if (!shortCode) {
@@ -549,27 +623,24 @@
 
         try {
 
-            const response =
-                await fetch(
-                    MAKE_WEBHOOK,
-                    {
-                        method: "POST",
+            const response = await fetch(
+                MAKE_WEBHOOK,
+                {
+                    method: "POST",
 
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                        body: JSON.stringify({
-                            short_code:
-                                shortCode
-                        })
-                    }
-                );
+                    body: JSON.stringify({
+                        short_code: shortCode
+                    })
+                }
+            );
 
 
             if (!response.ok) {
-
                 throw new Error(
                     "Request failed"
                 );
@@ -582,18 +653,23 @@
 
             let data;
 
+
             try {
 
-                data =
-                    JSON.parse(text);
+                data = JSON.parse(text);
 
-            } catch (e) {
+            } catch (error) {
 
                 throw new Error(
                     "Invalid response"
                 );
             }
 
+
+            /*
+             * Support the different response
+             * structures that Make may return.
+             */
 
             let video = null;
 
@@ -604,43 +680,30 @@
                 typeof data.video === "object"
             ) {
 
-                video =
-                    data.video;
+                video = data.video;
 
             } else if (
                 data &&
                 Array.isArray(data.videos) &&
-                data.videos.length > 0
+                data.videos.length
             ) {
 
-                video =
-                    data.videos[0];
+                video = data.videos[0];
 
             } else if (
                 data &&
                 Array.isArray(data.data) &&
-                data.data.length > 0
+                data.data.length
             ) {
 
-                video =
-                    data.data[0];
+                video = data.data[0];
 
             } else if (
                 data &&
-                typeof data === "object" &&
-                (
-                    data.movie_name ||
-                    data.movieName ||
-                    data.file_name ||
-                    data.short_code ||
-                    data.shortCode ||
-                    data.language ||
-                    data.file_size
-                )
+                typeof data === "object"
             ) {
 
-                video =
-                    data;
+                video = data;
             }
 
 
@@ -657,10 +720,12 @@
             displayVideo(video);
 
 
-            startAdProcess();
-
-
         } catch (error) {
+
+            console.error(
+                "Video loading error:",
+                error
+            );
 
             showError(
                 "Unable to load the video."
@@ -669,159 +734,12 @@
     }
 
 
-    /* =========================================
-       MONETAG
-    ========================================= */
-
-    function startAdProcess() {
-
-        setTimeout(() => {
-
-            try {
-
-                if (
-                    typeof show_11903209 ===
-                    "function"
-                ) {
-
-                    show_11903209({
-
-                        type: "inApp",
-
-                        inAppSettings: {
-
-                            frequency: 2,
-
-                            capping: 0.1,
-
-                            interval: 30,
-
-                            timeout: 5,
-
-                            everyPage: false
-                        }
-
-                    });
-                }
-
-            } catch (error) {
-                // Continue normally if ad fails
-            }
-
-
-            waitForReturn();
-
-        }, 3000);
-    }
-
-
-    /* =========================================
-       WAIT FOR RETURN
-    ========================================= */
-
-    function waitForReturn() {
-
-        let countdownStarted =
-            false;
-
-        let fallbackTimer;
-
-
-        function startCountdownOnce() {
-
-            if (countdownStarted) {
-                return;
-            }
-
-            countdownStarted =
-                true;
-
-            clearTimeout(
-                fallbackTimer
-            );
-
-            document.removeEventListener(
-                "visibilitychange",
-                visibilityHandler
-            );
-
-            startCountdown();
-        }
-
-
-        function visibilityHandler() {
-
-            if (
-                document.visibilityState ===
-                "visible"
-            ) {
-
-                startCountdownOnce();
-            }
-        }
-
-
-        document.addEventListener(
-            "visibilitychange",
-            visibilityHandler
-        );
-
-
-        fallbackTimer =
-            setTimeout(
-                startCountdownOnce,
-                8000
-            );
-    }
-
-
-    /* =========================================
-       COUNTDOWN
-    ========================================= */
-
-    function startCountdown() {
-
-        let remaining = 5;
-
-
-        countdown.textContent =
-            "Download available in " +
-            remaining +
-            " seconds";
-
-
-        const timer =
-            setInterval(() => {
-
-                remaining--;
-
-
-                if (remaining > 0) {
-
-                    countdown.textContent =
-                        "Download available in " +
-                        remaining +
-                        " seconds";
-
-                } else {
-
-                    clearInterval(timer);
-
-                    countdown.textContent =
-                        "";
-
-                    downloadBtn.style.display =
-                        "block";
-                }
-
-            }, 1000);
-    }
-
-
-    /* =========================================
-       DOWNLOAD
-    ========================================= */
-
+    /*
+     * Download button
+     *
+     * This only opens the Telegram bot.
+     * It does NOT call Monetag.
+     */
     downloadBtn.addEventListener(
         "click",
         function () {
@@ -835,21 +753,18 @@
                 "https://t.me/" +
                 BOT_USERNAME +
                 "?start=" +
-                encodeURIComponent(
-                    actualCode
-                );
+                encodeURIComponent(actualCode);
 
 
             if (
                 window.Telegram &&
                 window.Telegram.WebApp &&
-                typeof window.Telegram.WebApp.openTelegramLink ===
-                "function"
+                typeof window.Telegram.WebApp
+                    .openTelegramLink === "function"
             ) {
 
-                window.Telegram.WebApp.openTelegramLink(
-                    botLink
-                );
+                window.Telegram.WebApp
+                    .openTelegramLink(botLink);
 
             } else {
 
@@ -860,10 +775,12 @@
     );
 
 
-    /* =========================================
-       START
-    ========================================= */
-
+    /*
+     * Load the video.
+     *
+     * The Monetag function has already been
+     * called separately in <head>.
+     */
     loadVideo();
 
 </script>
